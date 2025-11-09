@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../Saturday_Back.Tests/Saturday_Back.Tests.csproj" Id="fa14a7b5-c476-4659-a4b2-1a49d55de0bc" />
   <Project Path="Saturday_Back.csproj" />
 </Solution>
