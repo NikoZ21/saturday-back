@@ -37,16 +37,37 @@ public class ScheduleService
     {
         // Two payments - split the cost
         var halfCost = totalCost / 2;
-        return new[] { halfCost.ToString(), halfCost.ToString() };
+
+        var firstPaymentDate = new DateTime(2025, firstMonth, 1);
+        int secondPaymentMonth = (lastMonth - firstMonth) / 2;
+        var secondPaymentDate = new DateTime(2025, secondPaymentMonth, 1);
+
+        return new[]
+        {
+            $"{firstPaymentDate:yyyy}-{firstPaymentDate.ToString("MMMM")}-04 - {halfCost:N2}",
+            $"{secondPaymentDate:yyyy}-{secondPaymentDate.ToString("MMMM")}-04 - {halfCost:N2}"
+        };
     }
 
     private string[] GenerateMonthlySchedule(decimal totalCost, int firstMonth, int lastMonth)
     {
         // Monthly payments across the period
-        var monthsCount = lastMonth - firstMonth + 1;
+        var monthsCount = lastMonth - firstMonth;
         var monthlyPayment = totalCost / monthsCount;
-        return Enumerable.Range(0, monthsCount)
-            .Select(_ => monthlyPayment.ToString())
-            .ToArray();
+
+        var dates = new string[monthsCount];
+        for (int i = 0; i < monthsCount; i++)
+        {
+            var month = (firstMonth + i) % 12;
+
+            if (month == 0)
+            {
+                month = 12;
+            }
+
+            dates[i] = $"{new DateTime(2025, month, 1).ToString("yyyy-MM-dd")} - {monthlyPayment:N2}";
+        }
+
+        return dates;
     }
 }

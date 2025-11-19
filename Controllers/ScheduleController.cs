@@ -21,7 +21,7 @@ namespace Saturday_Back.Controllers
         public IActionResult CreateSchedule()
         {
             var benefitType = new BenefitType { Id = 1, Name = "Benefit Type", Discount = 10, Value = BenefitTypeValue.NONE };
-            var paymentType = new PaymentType { Id = 1, Name = "Payment Type", Discount = 10, Value = PaymentTypeValue.ONETIME };
+            var paymentType = new PaymentType { Id = 1, Name = "Payment Type", Discount = 10, Value = PaymentTypeValue.MONTHLY };
             // var baseCost = new BaseCost { Id = 1, StudyYear = "2025", Cost = 100 };
             var saturdaysCount = 30;
             var firstMonth = 10;

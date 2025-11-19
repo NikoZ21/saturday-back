@@ -8,7 +8,7 @@ namespace Saturday_Back.Services
     {
         private readonly ICachedRepository<PaymentType, PaymentTypeResponseDto> _repository = repository;
 
-        public Task<List<PaymentTypeResponseDto>> GetAllAsync() => _repository.GetAllAsync();
+        public Task<List<PaymentTypeResponseDto>?> GetAllAsync() => _repository.GetAllAsync();
         public Task UpdatePaymentTypeAsync(PaymentType updatedPayment) => _repository.UpdateAsync(updatedPayment);
     }
 }
