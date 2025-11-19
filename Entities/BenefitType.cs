@@ -6,7 +6,7 @@ namespace Saturday_Back.Entities
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        public decimal? Discount { get; set; }
+        public decimal Discount { get; set; }
         public BenefitTypeValue Value { get; set; }
     }
 }

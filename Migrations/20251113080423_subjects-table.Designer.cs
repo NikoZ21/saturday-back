@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Saturday_Back;
 
@@ -10,9 +11,11 @@ using Saturday_Back;
 namespace Saturday_Back.Migrations
 {
     [DbContext(typeof(FssDbContext))]
-    partial class FssDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113080423_subjects-table")]
+    partial class subjectstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +24,7 @@ namespace Saturday_Back.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Saturday_Back.Entities.BaseCost", b =>
+            modelBuilder.Entity("Saturday_Back.Entities.BaseCosts", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,14 +35,12 @@ namespace Saturday_Back.Migrations
 
                     b.Property<decimal>("Cost")
                         .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)")
-                        .HasColumnName("cost");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("StudyYear")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("study_year");
+                        .HasColumnType("varchar(20)");
 
                     b.HasKey("Id");
 
@@ -121,8 +122,7 @@ namespace Saturday_Back.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 

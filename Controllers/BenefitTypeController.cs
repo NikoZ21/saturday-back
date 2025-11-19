@@ -24,7 +24,7 @@ namespace Saturday_Back.Controllers
         [HttpPost("update")]
         public async Task<IActionResult> Update([FromBody] BenefitType benefitType)
         {
-            await _benefitTypeService.UpdateBenefitTypeAsync(benefitType);
+            await _benefitTypeService.UpdatAsync(benefitType);
             return Ok("Payment type updated and cache refreshed");
         }
     }

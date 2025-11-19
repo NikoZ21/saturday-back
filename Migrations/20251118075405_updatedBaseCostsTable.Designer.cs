@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Saturday_Back;
 
@@ -10,9 +11,11 @@ using Saturday_Back;
 namespace Saturday_Back.Migrations
 {
     [DbContext(typeof(FssDbContext))]
-    partial class FssDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251118075405_updatedBaseCostsTable")]
+    partial class updatedBaseCostsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

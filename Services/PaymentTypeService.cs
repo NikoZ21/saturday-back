@@ -1,50 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Saturday_Back.Dtos;
 using Saturday_Back.Entities;
+using Saturday_Back.Repositories;
 
 namespace Saturday_Back.Services
 {
-    public class PaymentTypeService
+    public class PaymentTypeService(ICachedRepository<PaymentType, PaymentTypeResponseDto> repository)
     {
-        private readonly FssDbContext _dbContext;
-        private readonly IMemoryCache _cache;
-        private const string CacheKey = "PaymentTypes";
+        private readonly ICachedRepository<PaymentType, PaymentTypeResponseDto> _repository = repository;
 
-        public PaymentTypeService(FssDbContext dbContext, IMemoryCache cache)
-        {
-            _dbContext = dbContext;
-            _cache = cache;
-        }
-
-        public async Task<List<PaymentType>> GetAllAsync()
-        {
-            if (!_cache.TryGetValue(CacheKey, out List<PaymentType>? paymentTypes))
-            {
-                Console.WriteLine("Loading payment types from database... and caching...");
-                paymentTypes = await _dbContext.PaymentTypes.AsNoTracking().ToListAsync();
-                _cache.Set(CacheKey, paymentTypes);
-            }
-
-            Console.WriteLine("Returning payment types from cache...");
-            return paymentTypes;
-        }
-
-        public async Task UpdatePaymentTypeAsync(PaymentType updatedPayment)
-        {
-            var existing = await _dbContext.PaymentTypes.FindAsync(updatedPayment.Id);
-
-            if (existing != null)
-            {
-                existing.Name = updatedPayment.Name;
-                existing.Discount = updatedPayment.Discount;
-                existing.Value = updatedPayment.Value;
-
-                await _dbContext.SaveChangesAsync();
-
-                //refresh cache
-                var paymentTypes = await _dbContext.PaymentTypes.AsNoTracking().ToListAsync();
-                _cache.Set(CacheKey, paymentTypes);
-            }
-        }
+        public Task<List<PaymentTypeResponseDto>> GetAllAsync() => _repository.GetAllAsync();
+        public Task UpdatePaymentTypeAsync(PaymentType updatedPayment) => _repository.UpdateAsync(updatedPayment);
     }
 }
