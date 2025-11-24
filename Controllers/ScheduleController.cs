@@ -23,11 +23,12 @@ namespace Saturday_Back.Controllers
             var benefitType = new BenefitType { Id = 1, Name = "Benefit Type", Discount = 10, Value = BenefitTypeValue.NONE };
             var paymentType = new PaymentType { Id = 1, Name = "Payment Type", Discount = 10, Value = PaymentTypeValue.MONTHLY };
             // var baseCost = new BaseCost { Id = 1, StudyYear = "2025", Cost = 100 };
-            var saturdaysCount = 30;
+            var firstSaturday = 1;
+            var lastSaturday = 30;
             var firstMonth = 10;
             var lastMonth = 17;
 
-            var schedule = _scheduleService.BuildPaymentSchedule(benefitType, paymentType, 390, saturdaysCount, firstMonth, lastMonth);
+            var schedule = _scheduleService.BuildPaymentSchedule(benefitType, paymentType, 390, firstSaturday, lastSaturday, firstMonth, lastMonth);
             // Console.WriteLine(schedule);
             return Ok(schedule);
         }

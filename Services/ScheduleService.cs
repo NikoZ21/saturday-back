@@ -3,18 +3,26 @@ using Saturday_Back.Enums;
 
 public class ScheduleService
 {
-    public string[] BuildPaymentSchedule(BenefitType benefitType, PaymentType paymentType, int baseCost, int saturdaysCount, int firstMonth, int lastMonth)
+    public string[] BuildPaymentSchedule(BenefitType benefitType, PaymentType paymentType, int baseCost, int firstSaturday, int lastSaturday, int firstMonth, int lastMonth)
     {
-        Console.WriteLine("Building payment schedule--------------------------------");
 
-        Console.WriteLine($"Base cost: {baseCost}");
+        if (lastMonth < firstMonth)
+        {
+            throw new ArgumentOutOfRangeException(nameof(lastMonth), "Last month can't be less than first month");
+        }
+
+        if (lastSaturday < firstSaturday)
+        {
+            throw new ArgumentOutOfRangeException(nameof(lastSaturday), "Last Saturday can't be less than first Saturday");
+        }
+
+
+        var saturdaysCount = lastSaturday - firstSaturday + 1;
 
         var totalDiscount = benefitType.Discount + (paymentType.Discount ?? 0);
         var discountedCost = baseCost * (1 - totalDiscount / 100);
-        Console.WriteLine($"Discounted cost: {discountedCost}");
 
         var cost = discountedCost * (saturdaysCount / 30);
-        Console.WriteLine($"Cost: {cost}");
 
         // Route to the appropriate schedule generator based on payment type
         return paymentType.Value switch
@@ -29,7 +37,6 @@ public class ScheduleService
     private string[] GenerateSinglePaymentSchedule(decimal totalCost, int firstMonth, int lastMonth)
     {
         // Single payment - all at once
-
         var date = new DateTime(2025, firstMonth, 1);
         return new[] { $"{date.ToString("yyyy-MM-dd")} - {totalCost.ToString("N2")}" };
     }
