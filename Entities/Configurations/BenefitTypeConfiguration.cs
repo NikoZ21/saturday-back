@@ -30,3 +30,4 @@ namespace Saturday_Back.Entities.Configurations
     }
 }
 
+
