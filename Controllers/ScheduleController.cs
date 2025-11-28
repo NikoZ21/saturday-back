@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Saturday_Back.Entities;
 using Saturday_Back.Enums;
+using Saturday_Back.Services;
 
 namespace Saturday_Back.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ScheduleController(ScheduleService scheduleService) : ControllerBase
+    public class ScheduleController(ScheduleService scheduleService, BenefitTypeService benefitTypeService, PaymentTypeService paymentTypeService, BaseCostService baseCostService) : ControllerBase
     {
-
+        private readonly BenefitTypeService _benefitTypeService = benefitTypeService;
+        private readonly PaymentTypeService _paymentTypeService = paymentTypeService;
+        private readonly BaseCostService _baseCostService = baseCostService;
         private readonly ScheduleService _scheduleService = scheduleService;
 
         [HttpGet]

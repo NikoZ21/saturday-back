@@ -1,9 +1,13 @@
-﻿using Saturday_Back.Entities;
+﻿using Saturday_Back.Dtos;
+using Saturday_Back.Entities;
 using Saturday_Back.Enums;
+using Saturday_Back.Repositories;
 
-public class ScheduleService
+public class ScheduleService(ICachedRepository<Schedule, ScheduleResponseDto> repository)
 {
-    public string[] BuildPaymentSchedule(BenefitType benefitType, PaymentType paymentType, int baseCost, int firstSaturday, int lastSaturday, int firstMonth, int lastMonth)
+    private readonly ICachedRepository<Schedule, ScheduleResponseDto> _repository = repository;
+
+    public string BuildPaymentSchedule(BenefitType benefitType, PaymentType paymentType, int baseCost, int firstSaturday, int lastSaturday, int firstMonth, int lastMonth)
     {
 
         if (lastMonth < firstMonth)
@@ -16,31 +20,35 @@ public class ScheduleService
             throw new ArgumentOutOfRangeException(nameof(lastSaturday), "Last Saturday can't be less than first Saturday");
         }
 
-
         var saturdaysCount = lastSaturday - firstSaturday + 1;
-
         var totalDiscount = benefitType.Discount + (paymentType.Discount ?? 0);
         var discountedCost = baseCost * (1 - totalDiscount / 100);
-
         var cost = discountedCost * (saturdaysCount / 30);
 
         // Route to the appropriate schedule generator based on payment type
-        return paymentType.Value switch
+        var scheduleEntries = paymentType.Value switch
         {
             PaymentTypeValue.ONETIME => GenerateSinglePaymentSchedule(cost, firstMonth, lastMonth),
             PaymentTypeValue.TWOTIME => GenerateTwoPartPaymentSchedule(cost, firstMonth, lastMonth),
             PaymentTypeValue.MONTHLY => GenerateMonthlySchedule(cost, firstMonth, lastMonth),
             _ => throw new ArgumentException("Invalid payment type")
         };
+
+        // var schedule = new Schedule{
+
+        // }
+
+        return "Successfully generated schedule";
     }
 
-    private string[] GenerateSinglePaymentSchedule(decimal totalCost, int firstMonth, int lastMonth)
+    private ScheduleEntry[] GenerateSinglePaymentSchedule(decimal totalCost, int firstMonth, int lastMonth)
     {
         // Single payment - all at once
         var date = new DateTime(2025, firstMonth, 1);
-        return new[] { $"{date.ToString("yyyy-MM-dd")} - {totalCost.ToString("N2")}" };
+
+        return new ScheduleEntry[] { new ScheduleEntry { Date = date, Cost = totalCost } };
     }
-    private string[] GenerateTwoPartPaymentSchedule(decimal totalCost, int firstMonth, int lastMonth)
+    private ScheduleEntry[] GenerateTwoPartPaymentSchedule(decimal totalCost, int firstMonth, int lastMonth)
     {
         // Two payments - split the cost
         var halfCost = totalCost / 2;
@@ -49,20 +57,20 @@ public class ScheduleService
         int secondPaymentMonth = (lastMonth - firstMonth) / 2;
         var secondPaymentDate = new DateTime(2025, secondPaymentMonth, 1);
 
-        return new[]
+        return new ScheduleEntry[]
         {
-            $"{firstPaymentDate:yyyy}-{firstPaymentDate.ToString("MMMM")}-04 - {halfCost:N2}",
-            $"{secondPaymentDate:yyyy}-{secondPaymentDate.ToString("MMMM")}-04 - {halfCost:N2}"
+            new ScheduleEntry { Date = firstPaymentDate, Cost = halfCost },
+            new ScheduleEntry { Date = secondPaymentDate, Cost = halfCost }
         };
     }
 
-    private string[] GenerateMonthlySchedule(decimal totalCost, int firstMonth, int lastMonth)
+    private ScheduleEntry[] GenerateMonthlySchedule(decimal totalCost, int firstMonth, int lastMonth)
     {
         // Monthly payments across the period
         var monthsCount = lastMonth - firstMonth;
         var monthlyPayment = totalCost / monthsCount;
 
-        var dates = new string[monthsCount];
+        var scheduleEntries = new ScheduleEntry[monthsCount];
         for (int i = 0; i < monthsCount; i++)
         {
             var month = (firstMonth + i) % 12;
@@ -72,9 +80,9 @@ public class ScheduleService
                 month = 12;
             }
 
-            dates[i] = $"{new DateTime(2025, month, 1).ToString("yyyy-MM-dd")} - {monthlyPayment:N2}";
+            scheduleEntries[i] = new ScheduleEntry { Date = new DateTime(2025, month, 1), Cost = monthlyPayment };
         }
 
-        return dates;
+        return scheduleEntries;
     }
 }

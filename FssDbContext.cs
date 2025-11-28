@@ -14,6 +14,10 @@ namespace Saturday_Back
         public DbSet<BenefitType> BenefitTypes { get; set; }
         public DbSet<BaseCost> BaseCosts { get; set; }
         public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Student> Students { get; set; }
+        public DbSet<StudyYear> StudyYears { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
