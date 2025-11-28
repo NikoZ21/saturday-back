@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Saturday_Back.Entities;
+using System.Reflection;
 
 namespace Saturday_Back
 {
@@ -18,6 +19,10 @@ namespace Saturday_Back
         {
             base.OnModelCreating(modelBuilder);
 
+            // Apply all entity configurations from the current assembly
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // Apply lowercase naming convention to all tables and columns
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 entity.SetTableName(entity?.GetTableName()?.ToLowerInvariant());
@@ -32,60 +37,6 @@ namespace Saturday_Back
                     property.SetColumnName(property.GetColumnName().ToLowerInvariant());
                 }
             }
-
-            modelBuilder.Entity<PaymentType>(entity =>
-            {
-                entity.ToTable("payment_types");
-
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id).HasColumnName("rec_id").ValueGeneratedOnAdd();
-
-                entity.Property(e => e.Value).HasConversion<string>().IsRequired();
-
-                entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
-
-                entity.Property(e => e.Discount).HasPrecision(5, 2).IsRequired();
-            });
-
-
-            modelBuilder.Entity<BenefitType>(entity =>
-            {
-                entity.ToTable("benefit_types");
-
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id).HasColumnName("rec_id").ValueGeneratedOnAdd();
-
-                entity.Property(e => e.Value).HasConversion<string>().IsRequired();
-
-                entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
-
-                entity.Property(e => e.Discount).HasPrecision(5, 2).IsRequired();
-            });
-
-
-            modelBuilder.Entity<BaseCost>(entity =>
-            {
-                entity.ToTable("base_costs");
-
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnName("rec_id").ValueGeneratedOnAdd();
-
-                entity.Property(e => e.StudyYear).HasColumnName("study_year").HasMaxLength(20).IsRequired();
-                entity.HasIndex(e => e.StudyYear).IsUnique();
-
-                entity.Property(e => e.Cost).HasColumnName("cost").HasPrecision(10, 2).IsRequired();
-            });
-
-            modelBuilder.Entity<Subject>(entity =>
-            {
-                entity.ToTable("subjects");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnName("rec_id").ValueGeneratedOnAdd();
-                entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
-                entity.HasIndex(e => e.Name).IsUnique();
-            });
         }
     }
 }
