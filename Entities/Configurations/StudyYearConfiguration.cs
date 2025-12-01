@@ -7,7 +7,11 @@ namespace Saturday_Back.Entities.Configurations
     {
         public void Configure(EntityTypeBuilder<StudyYear> builder)
         {
-            builder.ToTable("study_years");
+            builder.ToTable("study_years", t =>
+            {
+                // Enforce "YYYY-YYYY" format at database level
+                t.HasCheckConstraint("CK_StudyYear_YearRange_Format", "\"YearRange\" ~ '^[0-9]{4}-[0-9]{4}$'");
+            });
 
             builder.HasKey(e => e.Id);
 
@@ -15,16 +19,17 @@ namespace Saturday_Back.Entities.Configurations
                 .HasColumnName("rec_id")
                 .ValueGeneratedOnAdd();
 
-            builder.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsRequired();
+            builder.Property(e => e.YearRange)
+                .HasMaxLength(9)
+                .IsRequired()
+                .HasColumnType("varchar(9)");
 
-            builder.HasIndex(e => e.Name)
+            builder.HasIndex(e => e.YearRange)
                 .IsUnique();
 
             builder.HasMany(e => e.Students)
-                .WithOne(s => s.StudyYear)
-                .HasForeignKey(s => s.StudyYearId)
+                .WithOne(s => s.AdmissionYear)
+                .HasForeignKey(s => s.AdmissionYearId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

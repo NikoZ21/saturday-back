@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+# General Rules for Agent Mode
+
+## 1. Question-First Approach
+
+When I ask a question in Agent mode:
+
+- **Answer the question first** - provide explanation, guidance, or information
+- **Ask if I want implementation** - don't automatically start generating code
+- Wait for confirmation before making any code changes
+
+## 2. Stick to the Specification
+
+- **Do ONLY the specified work** - don't add extra features or make additional changes
+- **Ask before doing anything extra** - if you come up with a better solution or want to add extra functionality, ask me first
+- Get explicit approval before deviating from the original request

@@ -16,7 +16,7 @@ namespace Saturday_Back.Entities.Configurations
                 .ValueGeneratedOnAdd();
 
             builder.Property(e => e.Identificator)
-                .HasMaxLength(50)
+                .HasMaxLength(11)
                 .IsRequired();
 
             builder.HasIndex(e => e.Identificator)
@@ -30,9 +30,9 @@ namespace Saturday_Back.Entities.Configurations
                 .HasMaxLength(100)
                 .IsRequired();
 
-            builder.HasOne(e => e.StudyYear)
+            builder.HasOne(e => e.AdmissionYear)
                 .WithMany(sy => sy.Students)
-                .HasForeignKey(e => e.StudyYearId)
+                .HasForeignKey(e => e.AdmissionYearId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

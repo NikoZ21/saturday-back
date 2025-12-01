@@ -6,9 +6,8 @@ namespace Saturday_Back.Entities
         public string? Identificator { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-
-        public int StudyYearId { get; set; }
-        public StudyYear? StudyYear { get; set; }
+        public int AdmissionYearId { get; set; }
+        public StudyYear? AdmissionYear { get; set; }
     }
 }
 
