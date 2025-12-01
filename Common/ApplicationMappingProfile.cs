@@ -1,0 +1,62 @@
+using AutoMapper;
+using Saturday_Back.Features.BaseCosts;
+using Saturday_Back.Features.BaseCosts.Dtos;
+using Saturday_Back.Features.BenefitTypes;
+using Saturday_Back.Features.BenefitTypes.Dtos;
+using Saturday_Back.Features.PaymentTypes;
+using Saturday_Back.Features.PaymentTypes.Dtos;
+using Saturday_Back.Features.Schedules;
+using Saturday_Back.Features.Schedules.Dtos;
+using Saturday_Back.Features.Students;
+using Saturday_Back.Features.Students.Dtos;
+using Saturday_Back.Features.StudyYears;
+using Saturday_Back.Features.StudyYears.Dtos;
+using Saturday_Back.Features.Subjects;
+using Saturday_Back.Features.Subjects.Dtos;
+
+namespace Saturday_Back.Common
+{
+    public class ApplicationMappingProfile : Profile
+    {
+        public ApplicationMappingProfile()
+        {
+            // PaymentType mappings
+            CreateMap<PaymentTypeRequestDto, PaymentType>();
+            CreateMap<PaymentType, PaymentTypeResponseDto>();
+
+            // BenefitType mappings
+            CreateMap<BenefitTypeRequestDto, BenefitType>();
+            CreateMap<BenefitType, BenefitTypeResponseDto>();
+
+            // Subject mappings
+            CreateMap<SubjectRequestDto, Subject>();
+            CreateMap<Subject, SubjectResponseDto>();
+
+            // BaseCost mappings
+            CreateMap<BaseCostRequestDto, BaseCost>();
+            CreateMap<BaseCost, BaseCostResponseDto>();
+
+            // StudyYear mappings
+            CreateMap<StudyYearRequestDto, StudyYear>();
+            CreateMap<StudyYear, StudyYearResponseDto>();
+
+            // Student mappings
+            CreateMap<StudentRequestDto, Student>();
+            CreateMap<Student, StudentResponseDto>()
+                .ForMember(dest => dest.AdmissionYearRange,
+                          opt => opt.MapFrom(src => src.AdmissionYear != null ? src.AdmissionYear.YearRange : null));
+
+            // Schedule mappings
+            CreateMap<ScheduleRequestDto, Schedule>();
+            CreateMap<Schedule, ScheduleResponseDto>()
+                .ForMember(dest => dest.SubjectName,
+                          opt => opt.MapFrom(src => src.Subject != null ? src.Subject.Name : null))
+                .ForMember(dest => dest.PaymentTypeName,
+                          opt => opt.MapFrom(src => src.PaymentType != null ? src.PaymentType.Name : null))
+                .ForMember(dest => dest.BenefitTypeName,
+                          opt => opt.MapFrom(src => src.BenefitType != null ? src.BenefitType.Name : null));
+            CreateMap<ScheduleEntry, ScheduleEntryDto>();
+        }
+    }
+}
+

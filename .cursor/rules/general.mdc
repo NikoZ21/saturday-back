@@ -17,3 +17,8 @@ When I ask a question in Agent mode:
 - **Do ONLY the specified work** - don't add extra features or make additional changes
 - **Ask before doing anything extra** - if you come up with a better solution or want to add extra functionality, ask me first
 - Get explicit approval before deviating from the original request
+
+## 3. Configuration Files
+
+- **NEVER modify configuration files** - do not configure or change `appsettings.json`, `appsettings.Development.json`, or any other configuration files
+- Configuration files contain sensitive data and environment-specific settings that should only be managed by the user
