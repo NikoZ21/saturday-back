@@ -6,7 +6,7 @@ namespace Saturday_Back.Features.BaseCosts
     {
         public int Id { get; set; }
         public int StudyYearId { get; set; }
-        public StudyYear StudyYear { get; set; }
+        public StudyYear? StudyYear { get; set; }
         public decimal Cost { get; set; }
     }
 }

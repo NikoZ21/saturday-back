@@ -64,7 +64,7 @@ namespace Saturday_Back.Features.Schedules
         /// </summary>
         private ScheduleEntry[] GenerateMonthlyPayments(decimal totalCost, int firstMonth, int lastMonth, StudyYear studyYear)
         {
-            var monthsCount = lastMonth - firstMonth + 1;
+            var monthsCount = lastMonth - firstMonth;
 
             if (monthsCount <= 0)
                 throw new ArgumentException(

@@ -65,7 +65,8 @@ namespace Saturday_Back.Features.Schedules
                     cost,
                     entities.PaymentType.Value,
                     request.FirstMonth,
-                    request.LastMonth
+                    request.LastMonth,
+                    entities.StudyYear
                     );
 
                 var schedule = BuildScheduleEntity(request, entities, entries);
