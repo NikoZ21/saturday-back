@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Saturday_Back.Common.Database;
 
@@ -10,9 +11,11 @@ using Saturday_Back.Common.Database;
 namespace Saturday_Back.Migrations
 {
     [DbContext(typeof(FssDbContext))]
-    partial class FssDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251202061651_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,13 +230,16 @@ namespace Saturday_Back.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Range")
+                    b.Property<string>("YearRange")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("year_range");
+                        .HasMaxLength(9)
+                        .HasColumnType("varchar(9)")
+                        .HasColumnName("yearrange");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("YearRange")
+                        .IsUnique();
 
                     b.ToTable("study_years", null, t =>
                         {

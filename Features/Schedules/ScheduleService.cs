@@ -55,8 +55,6 @@ namespace Saturday_Back.Features.Schedules
 
             try
             {
-                ValidateDateRanges(request);
-
                 var entities = await FetchRequiredEntitiesAsync(request);
                 await ValidateNoDuplicateScheduleAsync(entities);
 
@@ -67,7 +65,8 @@ namespace Saturday_Back.Features.Schedules
                     cost,
                     entities.PaymentType.Value,
                     request.FirstMonth,
-                    request.LastMonth);
+                    request.LastMonth
+                    );
 
                 var schedule = BuildScheduleEntity(request, entities, entries);
 
@@ -84,19 +83,6 @@ namespace Saturday_Back.Features.Schedules
         }
 
         #region Validation
-
-        private void ValidateDateRanges(ScheduleRequestDto request)
-        {
-            if (request.LastMonth < request.FirstMonth)
-                throw new ArgumentOutOfRangeException(
-                    nameof(request.LastMonth),
-                    "Last month cannot be less than first month");
-
-            if (request.LastSaturday < request.FirstSaturday)
-                throw new ArgumentOutOfRangeException(
-                    nameof(request.LastSaturday),
-                    "Last Saturday cannot be less than first Saturday");
-        }
 
         private async Task ValidateNoDuplicateScheduleAsync(ScheduleEntities entities)
         {
@@ -188,6 +174,7 @@ namespace Saturday_Back.Features.Schedules
         {
             return new Schedule
             {
+                StudyYearId = entities.StudyYear.Id,
                 StudentId = entities.Student.Id,
                 SubjectId = entities.Subject.Id,
                 PaymentTypeId = entities.PaymentType.Id,

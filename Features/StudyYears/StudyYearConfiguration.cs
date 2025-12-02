@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Saturday_Back.Features.Students;
 
 namespace Saturday_Back.Features.StudyYears
@@ -20,13 +21,15 @@ namespace Saturday_Back.Features.StudyYears
                 .HasColumnName("rec_id")
                 .ValueGeneratedOnAdd();
 
-            builder.Property(e => e.YearRange)
-                .HasMaxLength(9)
-                .IsRequired()
-                .HasColumnType("varchar(9)");
+            var converter = new ValueConverter<YearRangeValue, string>(
+                    v => v.ToString(),
+                    v => YearRangeValue.Parse(v));
 
-            builder.HasIndex(e => e.YearRange)
-                .IsUnique();
+            builder.Property(e => e.Range)
+                   .HasColumnName("year_range")
+                   .HasConversion(converter)
+                   .HasMaxLength(20)
+                   .IsRequired();
 
             builder.HasMany(e => e.Students)
                 .WithOne(s => s.AdmissionYear)

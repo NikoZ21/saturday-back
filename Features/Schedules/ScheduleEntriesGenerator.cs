@@ -1,4 +1,5 @@
 using Saturday_Back.Common.Enums;
+using Saturday_Back.Features.StudyYears;
 
 namespace Saturday_Back.Features.Schedules
 {
@@ -8,6 +9,8 @@ namespace Saturday_Back.Features.Schedules
     /// </summary>
     public class ScheduleEntriesGenerator
     {
+        private readonly int paymentDay = 4;
+
         /// <summary>
         /// Generates a list of payment entries based on the payment type.
         /// </summary>
@@ -15,20 +18,20 @@ namespace Saturday_Back.Features.Schedules
         /// <param name="paymentType">Type of payment schedule (one-time, two-part, or monthly)</param>
         /// <param name="firstMonth">Starting month (1-12)</param>
         /// <param name="lastMonth">Ending month (1-12)</param>
-        /// <param name="year">Year for the payment schedule (defaults to 2025)</param>
+        /// <param name="studyYear">Study year for the payment schedule</param>
         /// <returns>List of schedule entries with dates and costs</returns>
         public List<ScheduleEntry> Generate(
             decimal totalCost,
             PaymentTypeValue paymentType,
             int firstMonth,
             int lastMonth,
-            int year = 2025)
+            StudyYear studyYear)
         {
             var entries = paymentType switch
             {
-                PaymentTypeValue.ONETIME => GenerateSinglePayment(totalCost, firstMonth, year),
-                PaymentTypeValue.TWOTIME => GenerateTwoPartPayment(totalCost, firstMonth, lastMonth, year),
-                PaymentTypeValue.MONTHLY => GenerateMonthlyPayments(totalCost, firstMonth, lastMonth, year),
+                PaymentTypeValue.ONETIME => GenerateSinglePayment(totalCost, firstMonth, studyYear),
+                PaymentTypeValue.TWOTIME => GenerateTwoPartPayment(totalCost, firstMonth, lastMonth, studyYear),
+                PaymentTypeValue.MONTHLY => GenerateMonthlyPayments(totalCost, firstMonth, lastMonth, studyYear),
                 _ => throw new ArgumentException($"Invalid payment type: {paymentType}", nameof(paymentType))
             };
 
@@ -38,41 +41,30 @@ namespace Saturday_Back.Features.Schedules
         /// <summary>
         /// Generates a single payment entry for one-time payment.
         /// </summary>
-        private ScheduleEntry[] GenerateSinglePayment(decimal totalCost, int month, int year)
-        {
-            var date = new DateTime(year, month, 1);
-            return [new ScheduleEntry { Date = date, Cost = totalCost }];
-        }
+        private ScheduleEntry[] GenerateSinglePayment(decimal totalCost, int month, StudyYear studyYear)
+            => [CreateEntry(month, studyYear, totalCost)];
 
         /// <summary>
         /// Generates two payment entries, splitting the cost in half.
         /// </summary>
-        private ScheduleEntry[] GenerateTwoPartPayment(decimal totalCost, int firstMonth, int lastMonth, int year)
+        private ScheduleEntry[] GenerateTwoPartPayment(decimal totalCost, int firstMonth, int lastMonth, StudyYear studyYear)
         {
+            var secondPaymentMonth = firstMonth + ((lastMonth - firstMonth) / 2);
             var halfCost = totalCost / 2;
-            var firstPaymentDate = new DateTime(year, firstMonth, 1);
 
-            // Calculate middle month between first and last
-            int secondPaymentMonth = firstMonth + ((lastMonth - firstMonth) / 2);
-            if (secondPaymentMonth > 12)
-                secondPaymentMonth = 12;
-            if (secondPaymentMonth < 1)
-                secondPaymentMonth = 1;
-
-            var secondPaymentDate = new DateTime(year, secondPaymentMonth, 1);
-
-            return [
-                new ScheduleEntry { Date = firstPaymentDate, Cost = halfCost },
-                new ScheduleEntry { Date = secondPaymentDate, Cost = halfCost }
+            return
+            [
+                CreateEntry(firstMonth, studyYear, halfCost),
+                CreateEntry(secondPaymentMonth, studyYear, halfCost)
             ];
         }
 
         /// <summary>
         /// Generates monthly payment entries, distributing the cost evenly across months.
         /// </summary>
-        private ScheduleEntry[] GenerateMonthlyPayments(decimal totalCost, int firstMonth, int lastMonth, int year)
+        private ScheduleEntry[] GenerateMonthlyPayments(decimal totalCost, int firstMonth, int lastMonth, StudyYear studyYear)
         {
-            var monthsCount = lastMonth - firstMonth;
+            var monthsCount = lastMonth - firstMonth + 1;
 
             if (monthsCount <= 0)
                 throw new ArgumentException(
@@ -84,17 +76,29 @@ namespace Saturday_Back.Features.Schedules
 
             for (int i = 0; i < monthsCount; i++)
             {
-                var month = (firstMonth + i) % 12;
-                if (month == 0) month = 12;
-
-                scheduleEntries[i] = new ScheduleEntry
-                {
-                    Date = new DateTime(year, month, 1),
-                    Cost = monthlyPayment
-                };
+                scheduleEntries[i] = CreateEntry(firstMonth + i, studyYear, monthlyPayment);
             }
 
             return scheduleEntries;
+        }
+
+        private ScheduleEntry CreateEntry(int month, StudyYear studyYear, decimal amount)
+        {
+            var (year, normalizedMonth) = GetYearMonth(month, studyYear);
+            var day = Math.Min(paymentDay, DateTime.DaysInMonth(year, normalizedMonth));
+
+            return new ScheduleEntry
+            {
+                Date = new DateTime(year, normalizedMonth, day),
+                Cost = amount
+            };
+        }
+
+        private (int Year, int Month) GetYearMonth(int month, StudyYear studyYear)
+        {
+            var year = month > 12 ? studyYear.Range.EndYear : studyYear.Range.StartYear;
+            var normalizedMonth = ((month - 1) % 12) + 1;
+            return (year, normalizedMonth);
         }
     }
 }

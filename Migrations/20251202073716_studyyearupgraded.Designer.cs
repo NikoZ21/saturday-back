@@ -11,8 +11,8 @@ using Saturday_Back.Common.Database;
 namespace Saturday_Back.Migrations
 {
     [DbContext(typeof(FssDbContext))]
-    [Migration("20251201171933_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251202073716_studyyearupgraded")]
+    partial class studyyearupgraded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,16 +38,13 @@ namespace Saturday_Back.Migrations
                         .HasColumnType("decimal(10,2)")
                         .HasColumnName("cost");
 
-                    b.Property<string>("StudyYear")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("study_year");
+                    b.Property<int>("StudyYearId")
+                        .HasColumnType("int")
+                        .HasColumnName("study_year_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudyYear")
-                        .IsUnique();
+                    b.HasIndex("StudyYearId");
 
                     b.ToTable("base_costs", (string)null);
                 });
@@ -154,6 +151,14 @@ namespace Saturday_Back.Migrations
                         .HasColumnType("json")
                         .HasColumnName("schedule_entries");
 
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int")
+                        .HasColumnName("studentid");
+
+                    b.Property<int>("StudyYearId")
+                        .HasColumnType("int")
+                        .HasColumnName("studyyearid");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int")
                         .HasColumnName("subjectid");
@@ -165,6 +170,10 @@ namespace Saturday_Back.Migrations
                     b.HasIndex("BenefitTypeId");
 
                     b.HasIndex("PaymentTypeId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("StudyYearId");
 
                     b.HasIndex("SubjectId");
 
@@ -221,16 +230,13 @@ namespace Saturday_Back.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("YearRange")
+                    b.Property<string>("Range")
                         .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("varchar(9)")
-                        .HasColumnName("yearrange");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("year_range");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("YearRange")
-                        .IsUnique();
 
                     b.ToTable("study_years", null, t =>
                         {
@@ -261,6 +267,17 @@ namespace Saturday_Back.Migrations
                     b.ToTable("subjects", (string)null);
                 });
 
+            modelBuilder.Entity("Saturday_Back.Features.BaseCosts.BaseCost", b =>
+                {
+                    b.HasOne("Saturday_Back.Features.StudyYears.StudyYear", "StudyYear")
+                        .WithMany()
+                        .HasForeignKey("StudyYearId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("StudyYear");
+                });
+
             modelBuilder.Entity("Saturday_Back.Features.Schedules.Schedule", b =>
                 {
                     b.HasOne("Saturday_Back.Features.BaseCosts.BaseCost", "BaseCost")
@@ -281,6 +298,18 @@ namespace Saturday_Back.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Saturday_Back.Features.Students.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Saturday_Back.Features.StudyYears.StudyYear", "StudyYear")
+                        .WithMany()
+                        .HasForeignKey("StudyYearId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Saturday_Back.Features.Subjects.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
@@ -292,6 +321,10 @@ namespace Saturday_Back.Migrations
                     b.Navigation("BenefitType");
 
                     b.Navigation("PaymentType");
+
+                    b.Navigation("Student");
+
+                    b.Navigation("StudyYear");
 
                     b.Navigation("Subject");
                 });

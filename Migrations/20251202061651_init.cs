@@ -6,28 +6,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Saturday_Back.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "base_costs",
-                columns: table => new
-                {
-                    rec_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    study_year = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    cost = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_base_costs", x => x.rec_id);
-                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -98,6 +82,27 @@ namespace Saturday_Back.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "base_costs",
+                columns: table => new
+                {
+                    rec_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    study_year_id = table.Column<int>(type: "int", nullable: false),
+                    cost = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_base_costs", x => x.rec_id);
+                    table.ForeignKey(
+                        name: "FK_base_costs_study_years_study_year_id",
+                        column: x => x.study_year_id,
+                        principalTable: "study_years",
+                        principalColumn: "rec_id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "students",
                 columns: table => new
                 {
@@ -129,6 +134,8 @@ namespace Saturday_Back.Migrations
                 {
                     rec_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    studyyearid = table.Column<int>(type: "int", nullable: false),
+                    studentid = table.Column<int>(type: "int", nullable: false),
                     subjectid = table.Column<int>(type: "int", nullable: false),
                     paymenttypeid = table.Column<int>(type: "int", nullable: false),
                     benefittypeid = table.Column<int>(type: "int", nullable: false),
@@ -162,6 +169,18 @@ namespace Saturday_Back.Migrations
                         principalColumn: "rec_id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_schedules_students_studentid",
+                        column: x => x.studentid,
+                        principalTable: "students",
+                        principalColumn: "rec_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_schedules_study_years_studyyearid",
+                        column: x => x.studyyearid,
+                        principalTable: "study_years",
+                        principalColumn: "rec_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_schedules_subjects_subjectid",
                         column: x => x.subjectid,
                         principalTable: "subjects",
@@ -171,10 +190,9 @@ namespace Saturday_Back.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_base_costs_study_year",
+                name: "IX_base_costs_study_year_id",
                 table: "base_costs",
-                column: "study_year",
-                unique: true);
+                column: "study_year_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_schedules_basecostid",
@@ -190,6 +208,16 @@ namespace Saturday_Back.Migrations
                 name: "IX_schedules_paymenttypeid",
                 table: "schedules",
                 column: "paymenttypeid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_schedules_studentid",
+                table: "schedules",
+                column: "studentid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_schedules_studyyearid",
+                table: "schedules",
+                column: "studyyearid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_schedules_subjectid",
@@ -227,9 +255,6 @@ namespace Saturday_Back.Migrations
                 name: "schedules");
 
             migrationBuilder.DropTable(
-                name: "students");
-
-            migrationBuilder.DropTable(
                 name: "base_costs");
 
             migrationBuilder.DropTable(
@@ -237,6 +262,9 @@ namespace Saturday_Back.Migrations
 
             migrationBuilder.DropTable(
                 name: "payment_types");
+
+            migrationBuilder.DropTable(
+                name: "students");
 
             migrationBuilder.DropTable(
                 name: "subjects");

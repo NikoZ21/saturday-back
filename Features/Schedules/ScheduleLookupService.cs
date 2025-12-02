@@ -39,7 +39,9 @@ namespace Saturday_Back.Features.Schedules
         /// </summary>
         public async Task<StudyYear> GetStudyYearByRangeAsync(string yearRange)
         {
-            var studyYear = await _studyYearRepository.FirstOrDefaultAsync(sy => sy.YearRange == yearRange);
+            var yearRangeValue = YearRangeValue.Parse(yearRange);
+
+            var studyYear = await _studyYearRepository.FirstOrDefaultAsync(sy => sy.Range == yearRangeValue);
 
             if (studyYear == null)
                 throw new KeyNotFoundException($"Study year '{yearRange}' not found. Please ensure the study year exists in the system.");
@@ -91,6 +93,11 @@ namespace Saturday_Back.Features.Schedules
         /// </summary>
         public async Task<BaseCost> GetBaseCostByYearAsync(StudyYear studyYear)
         {
+            if (studyYear == null)
+            {
+                throw new ArgumentException("Study year not found, while looking up base cost.");
+            }
+
             var baseCost = await _baseCostRepository.FirstOrDefaultAsync(bc => bc.StudyYearId == studyYear.Id);
 
             if (baseCost == null)

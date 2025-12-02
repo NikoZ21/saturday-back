@@ -21,33 +21,20 @@ namespace Saturday_Back.Features.Schedules
             return Ok(schedules);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ScheduleResponseDto>> GetById(int id)
-        {
-            var schedule = await _service.GetByIdAsync(id);
-            if (schedule == null)
-                return NotFound();
-
-            return Ok(schedule);
-        }
-
         [HttpPost]
         public async Task<ActionResult<ScheduleResponseDto>> Create([FromBody] ScheduleRequestDto request)
         {
-            Console.WriteLine("enterign here");
             if (!ModelState.IsValid)
             {
                 var firstError = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .FirstOrDefault();
 
-                Console.WriteLine("nterign here");
-
                 if (firstError != null)
                     return BadRequest(firstError.ErrorMessage);
             }
 
-            // var result = await _service.CreateScheduleAsync(request);
+            var result = await _service.CreateScheduleAsync(request);
             return Ok("created successfully");
         }
     }

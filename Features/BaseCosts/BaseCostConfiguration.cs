@@ -15,13 +15,14 @@ namespace Saturday_Back.Features.BaseCosts
                 .HasColumnName("rec_id")
                 .ValueGeneratedOnAdd();
 
-            builder.Property(e => e.StudyYear)
-                .HasColumnName("study_year")
-                .HasMaxLength(20)
+            builder.Property(e => e.StudyYearId)
+                .HasColumnName("study_year_id")
                 .IsRequired();
 
-            builder.HasIndex(e => e.StudyYear)
-                .IsUnique();
+            builder.HasOne(e => e.StudyYear)
+                .WithMany()
+                .HasForeignKey(e => e.StudyYearId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(e => e.Cost)
                 .HasColumnName("cost")
