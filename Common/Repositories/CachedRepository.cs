@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Saturday_Back.Common.Database;
@@ -17,12 +18,12 @@ namespace Saturday_Back.Common.Repositories
             _cacheKey = cacheKey ?? throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        public async Task<List<TEntity>?> GetAllAsync()
+        public async Task<List<TEntity>?> GetAllAsync(params Expression<Func<TEntity, object>>[] includes)
         {
             return await _cache.GetOrCreateAsync(_cacheKey, async entry =>
             {
                 Console.WriteLine($"Cache miss for {_cacheKey} - loading from database.");
-                return await _dbContext.Set<TEntity>().AsNoTracking().ToListAsync();
+                return await ApplyIncludes(includes).AsNoTracking().ToListAsync();
             });
         }
 
@@ -51,6 +52,20 @@ namespace Saturday_Back.Common.Repositories
         {
             var entities = await _dbContext.Set<TEntity>().AsNoTracking().ToListAsync();
             _cache.Set(_cacheKey, entities);
+        }
+
+        private IQueryable<TEntity> ApplyIncludes(params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return query;
         }
     }
 }

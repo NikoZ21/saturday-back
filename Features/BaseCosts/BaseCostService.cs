@@ -17,7 +17,8 @@ namespace Saturday_Back.Features.BaseCosts
 
         public async Task<List<BaseCostResponseDto>> GetAllAsync()
         {
-            var entities = await _repository.GetAllAsync();
+            var entities = await _repository.GetAllAsync(
+                bc => bc.StudyYear!);
             return _mapper.Map<List<BaseCostResponseDto>>(entities);
         }
 

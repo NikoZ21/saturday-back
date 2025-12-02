@@ -34,7 +34,9 @@ namespace Saturday_Back.Common
 
             // BaseCost mappings
             CreateMap<BaseCostRequestDto, BaseCost>();
-            CreateMap<BaseCost, BaseCostResponseDto>();
+            CreateMap<BaseCost, BaseCostResponseDto>()
+                .ForMember(dest => dest.StudyYear,
+                    opt => opt.MapFrom(src => src.StudyYear != null ? src.StudyYear.YearRange : null));
 
             // StudyYear mappings
             CreateMap<StudyYearRequestDto, StudyYear>();
