@@ -49,12 +49,14 @@ namespace Saturday_Back.Common
             // Schedule mappings
             CreateMap<ScheduleRequestDto, Schedule>();
             CreateMap<Schedule, ScheduleResponseDto>()
-                .ForMember(dest => dest.SubjectName,
-                          opt => opt.MapFrom(src => src.Subject != null ? src.Subject.Name : null))
-                .ForMember(dest => dest.PaymentTypeName,
-                          opt => opt.MapFrom(src => src.PaymentType != null ? src.PaymentType.Name : null))
-                .ForMember(dest => dest.BenefitTypeName,
-                          opt => opt.MapFrom(src => src.BenefitType != null ? src.BenefitType.Name : null));
+                .ForMember(dest => dest.Subject,
+                          opt => opt.MapFrom(src => src.Subject != null ? src.Subject.Name : "default subject"))
+                .ForMember(dest => dest.PaymentType,
+                          opt => opt.MapFrom(src => src.PaymentType != null ? src.PaymentType.Name : "default payment type"))
+                .ForMember(dest => dest.BenefitType,
+                          opt => opt.MapFrom(src => src.BenefitType != null ? src.BenefitType.Name : "default benefit type"))
+                .ForMember(dest => dest.BaseCost,
+                            opt => opt.MapFrom(src => src.BaseCost != null ? src.BaseCost.Cost : 0));
             CreateMap<ScheduleEntry, ScheduleEntryDto>();
         }
     }

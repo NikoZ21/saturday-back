@@ -42,7 +42,7 @@ namespace Saturday_Back.Features.Schedules
         /// Generates a single payment entry for one-time payment.
         /// </summary>
         private ScheduleEntry[] GenerateSinglePayment(decimal totalCost, int month, StudyYear studyYear)
-            => [CreateEntry(month, studyYear, totalCost)];
+            => [CreateEntry(1, month, studyYear, totalCost)];
 
         /// <summary>
         /// Generates two payment entries, splitting the cost in half.
@@ -54,8 +54,8 @@ namespace Saturday_Back.Features.Schedules
 
             return
             [
-                CreateEntry(firstMonth, studyYear, halfCost),
-                CreateEntry(secondPaymentMonth, studyYear, halfCost)
+                CreateEntry(1, firstMonth, studyYear, halfCost),
+                CreateEntry(2, secondPaymentMonth, studyYear, halfCost)
             ];
         }
 
@@ -76,19 +76,20 @@ namespace Saturday_Back.Features.Schedules
 
             for (int i = 0; i < monthsCount; i++)
             {
-                scheduleEntries[i] = CreateEntry(firstMonth + i, studyYear, monthlyPayment);
+                scheduleEntries[i] = CreateEntry(i + 1, firstMonth + i, studyYear, monthlyPayment);
             }
 
             return scheduleEntries;
         }
 
-        private ScheduleEntry CreateEntry(int month, StudyYear studyYear, decimal amount)
+        private ScheduleEntry CreateEntry(int id, int month, StudyYear studyYear, decimal amount)
         {
             var (year, normalizedMonth) = GetYearMonth(month, studyYear);
             var day = Math.Min(paymentDay, DateTime.DaysInMonth(year, normalizedMonth));
 
             return new ScheduleEntry
             {
+                Id = id,
                 Date = new DateTime(year, normalizedMonth, day),
                 Cost = amount
             };

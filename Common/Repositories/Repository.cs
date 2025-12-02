@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Saturday_Back.Common.Database;
 
 namespace Saturday_Back.Common.Repositories
@@ -12,24 +13,26 @@ namespace Saturday_Back.Common.Repositories
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<List<TEntity>> GetAllAsync()
+        public async Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes)
         {
-            return await _dbContext.Set<TEntity>().AsNoTracking().ToListAsync();
+            return await ApplyIncludes(includes)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id)
+        public async Task<TEntity?> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes)
         {
-            return await _dbContext.Set<TEntity>().FindAsync(id);
+            return await ApplyIncludes(includes).FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
 
-        public async Task<TEntity?> FirstOrDefaultAsync(System.Linq.Expressions.Expression<Func<TEntity, bool>> predicate)
+        public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
-            return await _dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
+            return await ApplyIncludes(includes).FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<List<TEntity>> WhereAsync(System.Linq.Expressions.Expression<Func<TEntity, bool>> predicate)
+        public async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
-            return await _dbContext.Set<TEntity>().Where(predicate).ToListAsync();
+            return await ApplyIncludes(includes).Where(predicate).ToListAsync();
         }
 
         public async Task<TEntity> AddAsync(TEntity entity)
@@ -63,6 +66,19 @@ namespace Saturday_Back.Common.Repositories
 
             _dbContext.Set<TEntity>().Remove(tracked);
             await _dbContext.SaveChangesAsync();
+        }
+        private IQueryable<TEntity> ApplyIncludes(params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return query;
         }
     }
 }

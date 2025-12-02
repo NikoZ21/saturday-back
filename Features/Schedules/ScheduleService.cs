@@ -1,6 +1,5 @@
 using AutoMapper;
 using Saturday_Back.Common.Database;
-using Saturday_Back.Common.Enums;
 using Saturday_Back.Common.Repositories;
 using Saturday_Back.Features.BaseCosts;
 using Saturday_Back.Features.BenefitTypes;
@@ -39,13 +38,22 @@ namespace Saturday_Back.Features.Schedules
 
         public async Task<List<ScheduleResponseDto>> GetAllAsync()
         {
-            var entities = await _scheduleRepository.GetAllAsync();
+            var entities = await _scheduleRepository.GetAllAsync(
+                s => s.Subject!,
+                s => s.PaymentType!,
+                s => s.BenefitType!,
+                s => s.BaseCost!);
             return _mapper.Map<List<ScheduleResponseDto>>(entities);
         }
 
         public async Task<ScheduleResponseDto?> GetByIdAsync(int id)
         {
-            var entity = await _scheduleRepository.GetByIdAsync(id);
+            var entity = await _scheduleRepository.GetByIdAsync(
+                id,
+                s => s.Subject!,
+                s => s.PaymentType!,
+                s => s.BenefitType!,
+                s => s.BaseCost!);
             return entity == null ? null : _mapper.Map<ScheduleResponseDto>(entity);
         }
 
@@ -56,11 +64,11 @@ namespace Saturday_Back.Features.Schedules
             try
             {
                 var entities = await FetchRequiredEntitiesAsync(request);
+
                 await ValidateNoDuplicateScheduleAsync(entities);
 
                 var cost = CalculateScheduleCost(request, entities);
 
-                // Use the generator (factory) to create payment entries
                 var entries = _entriesGenerator.Generate(
                     cost,
                     entities.PaymentType.Value,
@@ -70,8 +78,8 @@ namespace Saturday_Back.Features.Schedules
                     );
 
                 var schedule = BuildScheduleEntity(request, entities, entries);
-
                 await _scheduleRepository.AddAsync(schedule);
+
                 await transaction.CommitAsync();
 
                 return _mapper.Map<ScheduleResponseDto>(schedule);
@@ -154,9 +162,13 @@ namespace Saturday_Back.Features.Schedules
         #endregion
 
         #region Calculation
-
         private decimal CalculateScheduleCost(ScheduleRequestDto request, ScheduleEntities entities)
         {
+            if (entities.BaseCost.Cost == 0)
+            {
+                throw new InvalidOperationException("Base cost is 0. Please ensure the base cost is set correctly.");
+            }
+
             var saturdaysCount = request.LastSaturday - request.FirstSaturday + 1;
             var totalDiscount = entities.BenefitType.Discount + (entities.PaymentType.Discount ?? 0);
             var discountedCost = entities.BaseCost.Cost * (1 - totalDiscount / 100);
