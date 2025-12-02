@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Saturday_Back.Common.Enums;
+using Saturday_Back.Features.Schedules.Validations;
 
 namespace Saturday_Back.Features.Schedules.Dtos
 {
@@ -33,6 +34,7 @@ namespace Saturday_Back.Features.Schedules.Dtos
 
         [Required]
         [Range(1, 30)]
+        [EnsureAfter("FirstSaturday")]
         public int LastSaturday { get; set; }
 
         [Required]
@@ -41,6 +43,7 @@ namespace Saturday_Back.Features.Schedules.Dtos
 
         [Required]
         [Range(10, 17)]
+        [EnsureAfter("FirstMonth")]
         public int LastMonth { get; set; }
 
         [Required]

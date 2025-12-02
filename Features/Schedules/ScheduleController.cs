@@ -34,11 +34,21 @@ namespace Saturday_Back.Features.Schedules
         [HttpPost]
         public async Task<ActionResult<ScheduleResponseDto>> Create([FromBody] ScheduleRequestDto request)
         {
+            Console.WriteLine("enterign here");
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .FirstOrDefault();
 
-            var result = await _service.CreateScheduleAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+                Console.WriteLine("nterign here");
+
+                if (firstError != null)
+                    return BadRequest(firstError.ErrorMessage);
+            }
+
+            // var result = await _service.CreateScheduleAsync(request);
+            return Ok("created successfully");
         }
     }
 }

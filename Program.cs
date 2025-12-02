@@ -10,6 +10,7 @@ using Saturday_Back.Features.Students;
 using Saturday_Back.Features.StudyYears;
 using Scalar.AspNetCore;
 using Saturday_Back.Common;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,11 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .AllowCredentials();
     });
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
 });
 
 // Caching
