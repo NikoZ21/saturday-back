@@ -27,11 +27,12 @@ namespace Saturday_Back.Common.Repositories
             });
         }
 
-        public async Task AddAsync(TEntity entity)
+        public async Task<TEntity> AddAsync(TEntity entity)
         {
-            await _dbContext.Set<TEntity>().AddAsync(entity);
+            var addedEntity = await _dbContext.Set<TEntity>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             await RefreshCacheAsync();
+            return addedEntity.Entity;
         }
 
         public async Task UpdateAsync(TEntity entity)

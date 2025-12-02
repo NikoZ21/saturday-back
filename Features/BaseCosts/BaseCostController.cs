@@ -28,7 +28,7 @@ namespace Saturday_Back.Features.BaseCosts
                 return BadRequest(ModelState);
 
             var result = await _service.CreateAsync(request);
-            return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]

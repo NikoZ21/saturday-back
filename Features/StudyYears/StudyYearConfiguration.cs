@@ -31,6 +31,9 @@ namespace Saturday_Back.Features.StudyYears
                    .HasMaxLength(20)
                    .IsRequired();
 
+            builder.HasIndex(e => e.Range)
+                   .IsUnique();
+
             builder.HasMany(e => e.Students)
                 .WithOne(s => s.AdmissionYear)
                 .HasForeignKey(s => s.AdmissionYearId)
