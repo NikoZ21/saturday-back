@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Saturday_Back.Common.Database;
 using Saturday_Back.Common.Repositories;
+using Saturday_Back.Features.AcademicYears;
 using Saturday_Back.Features.BaseCosts;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
@@ -64,6 +65,8 @@ builder.Services.AddCachedRepoWithService<BaseCost, BaseCostService>(
     cacheKey: "BaseCostsCache");
 builder.Services.AddCachedRepoWithService<StudyYear, StudyYearService>(
     cacheKey: "StudyYearsCache");
+builder.Services.AddCachedRepoWithService<AcademicYear, AcademicYearService>(
+    cacheKey: "AcademicYearsCache");
 
 // Register non-cached repository services (for transactional data)
 builder.Services.AddScoped<StudentService>();

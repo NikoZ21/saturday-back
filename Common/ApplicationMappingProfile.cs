@@ -1,4 +1,6 @@
 using AutoMapper;
+using Saturday_Back.Features.AcademicYears;
+using Saturday_Back.Features.AcademicYears.Dtos;
 using Saturday_Back.Features.BaseCosts;
 using Saturday_Back.Features.BaseCosts.Dtos;
 using Saturday_Back.Features.BenefitTypes;
@@ -9,8 +11,8 @@ using Saturday_Back.Features.Schedules;
 using Saturday_Back.Features.Schedules.Dtos;
 using Saturday_Back.Features.Students;
 using Saturday_Back.Features.Students.Dtos;
-using Saturday_Back.Features.StudyYears;
-using Saturday_Back.Features.StudyYears.Dtos;
+// using Saturday_Back.Features.StudyYears;
+// using Saturday_Back.Features.StudyYears.Dtos;
 using Saturday_Back.Features.Subjects;
 using Saturday_Back.Features.Subjects.Dtos;
 
@@ -38,9 +40,9 @@ namespace Saturday_Back.Common
                 .ForMember(dest => dest.StudyYear,
                     opt => opt.MapFrom(src => src.StudyYear != null ? src.StudyYear.YearRange : null));
 
-            // StudyYear mappings
-            CreateMap<StudyYearRequestDto, StudyYear>();
-            CreateMap<StudyYear, StudyYearResponseDto>();
+            // // StudyYear mappings
+            // CreateMap<StudyYearRequestDto, StudyYear>();
+            // CreateMap<StudyYear, StudyYearResponseDto>();
 
             // Student mappings
             CreateMap<StudentRequestDto, Student>();
@@ -60,6 +62,21 @@ namespace Saturday_Back.Common
                 .ForMember(dest => dest.BaseCost,
                             opt => opt.MapFrom(src => src.BaseCost != null ? src.BaseCost.Cost : 0));
             CreateMap<ScheduleEntry, ScheduleEntryDto>();
+
+
+
+            CreateMap<AcademicYearRequestDto, AcademicYear>()
+                          .ForMember(dest => dest.Range,
+                              opt => opt.MapFrom(src => YearRangeValue.Parse(src.YearRange)));
+
+            CreateMap<AcademicYear, AcademicYearResponseDto>()
+                .ForMember(dest => dest.YearRange,
+                    opt => opt.MapFrom(src => src.YearRange))
+                .ForMember(dest => dest.StartYear,
+                    opt => opt.MapFrom(src => src.StartYear))
+                .ForMember(dest => dest.EndYear,
+                    opt => opt.MapFrom(src => src.EndYear));
+
         }
     }
 }
