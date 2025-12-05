@@ -1,10 +1,10 @@
 using Saturday_Back.Common.Enums;
 using Saturday_Back.Common.Repositories;
-using Saturday_Back.Features.BaseCosts;
+using Saturday_Back.Features.AcademicYears;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
 using Saturday_Back.Features.Subjects;
-using Saturday_Back.Features.StudyYears;
+
 
 namespace Saturday_Back.Features.Schedules
 {
@@ -17,36 +17,34 @@ namespace Saturday_Back.Features.Schedules
         private readonly IRepository<BenefitType> _benefitTypeRepository;
         private readonly IRepository<PaymentType> _paymentTypeRepository;
         private readonly IRepository<Subject> _subjectRepository;
-        private readonly IRepository<StudyYear> _studyYearRepository;
-        private readonly IRepository<BaseCost> _baseCostRepository;
+        private readonly IRepository<AcademicYear> _academicYearRepository;
 
         public ScheduleLookupService(
             IRepository<BenefitType> benefitTypeRepository,
             IRepository<PaymentType> paymentTypeRepository,
             IRepository<Subject> subjectRepository,
-            IRepository<StudyYear> studyYearRepository,
-            IRepository<BaseCost> baseCostRepository)
+            IRepository<AcademicYear> academicYearRepository
+        )
         {
             _benefitTypeRepository = benefitTypeRepository;
             _paymentTypeRepository = paymentTypeRepository;
             _subjectRepository = subjectRepository;
-            _studyYearRepository = studyYearRepository;
-            _baseCostRepository = baseCostRepository;
+            _academicYearRepository = academicYearRepository;
         }
 
         /// <summary>
-        /// Gets a study year by its range (e.g., "2024-2025")
+        /// Gets an academic year by its range (e.g., "2024-2025")
         /// </summary>
-        public async Task<StudyYear> GetStudyYearByRangeAsync(string yearRange)
+        public async Task<AcademicYear> GetAcademicYearByRangeAsync(string yearRange)
         {
             var yearRangeValue = YearRangeValue.Parse(yearRange);
 
-            var studyYear = await _studyYearRepository.FirstOrDefaultAsync(sy => sy.Range == yearRangeValue);
+            var academicYear = await _academicYearRepository.FirstOrDefaultAsync(sy => sy.Range == yearRangeValue);
 
-            if (studyYear == null)
-                throw new KeyNotFoundException($"Study year '{yearRange}' not found. Please ensure the study year exists in the system.");
+            if (academicYear == null)
+                throw new KeyNotFoundException($"Academic year '{yearRange}' not found. Please ensure the academic year exists in the system.");
 
-            return studyYear;
+            return academicYear;
         }
 
         /// <summary>
@@ -86,24 +84,6 @@ namespace Saturday_Back.Features.Schedules
                 throw new KeyNotFoundException($"Payment type '{paymentTypeValue}' not found. Please ensure the payment type exists in the system.");
 
             return paymentType;
-        }
-
-        /// <summary>
-        /// Gets the base cost for a specific study year
-        /// </summary>
-        public async Task<BaseCost> GetBaseCostByYearAsync(StudyYear studyYear)
-        {
-            if (studyYear == null)
-            {
-                throw new ArgumentException("Study year not found, while looking up base cost.");
-            }
-
-            var baseCost = await _baseCostRepository.FirstOrDefaultAsync(bc => bc.StudyYearId == studyYear.Id);
-
-            if (baseCost == null)
-                throw new KeyNotFoundException($"Base cost not found for study year '{studyYear.YearRange}'. Please configure the base cost for this year.");
-
-            return baseCost;
         }
     }
 }

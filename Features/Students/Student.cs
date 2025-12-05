@@ -1,4 +1,4 @@
-using Saturday_Back.Features.StudyYears;
+using Saturday_Back.Features.AcademicYears;
 
 namespace Saturday_Back.Features.Students
 {
@@ -9,7 +9,7 @@ namespace Saturday_Back.Features.Students
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public int AdmissionYearId { get; set; }
-        public StudyYear? AdmissionYear { get; set; }
+        public AcademicYear? AdmissionYear { get; set; }
     }
 }
 

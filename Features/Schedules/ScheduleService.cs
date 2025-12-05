@@ -1,12 +1,10 @@
 using AutoMapper;
 using Saturday_Back.Common.Database;
 using Saturday_Back.Common.Repositories;
-using Saturday_Back.Features.BaseCosts;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
 using Saturday_Back.Features.Schedules.Dtos;
 using Saturday_Back.Features.Students;
-using Saturday_Back.Features.StudyYears;
 using Saturday_Back.Features.Subjects;
 
 namespace Saturday_Back.Features.Schedules
@@ -16,7 +14,7 @@ namespace Saturday_Back.Features.Schedules
         private readonly IRepository<Schedule> _scheduleRepository;
         private readonly IRepository<Student> _studentRepository;
         private readonly ScheduleLookupService _lookupService;
-        private readonly ScheduleEntriesGenerator _entriesGenerator;
+        private readonly ScheduleEntriesGenerator _scheduleEntriesGenerator;
         private readonly FssDbContext _dbContext;
         private readonly IMapper _mapper;
 
@@ -31,7 +29,7 @@ namespace Saturday_Back.Features.Schedules
             _scheduleRepository = scheduleRepository;
             _studentRepository = studentRepository;
             _lookupService = lookupService;
-            _entriesGenerator = entriesGenerator;
+            _scheduleEntriesGenerator = entriesGenerator;
             _dbContext = dbContext;
             _mapper = mapper;
         }
@@ -41,8 +39,7 @@ namespace Saturday_Back.Features.Schedules
             var entities = await _scheduleRepository.GetAllAsync(
                 s => s.Subject!,
                 s => s.PaymentType!,
-                s => s.BenefitType!,
-                s => s.BaseCost!);
+                s => s.BenefitType!);
             return _mapper.Map<List<ScheduleResponseDto>>(entities);
         }
 
@@ -52,8 +49,7 @@ namespace Saturday_Back.Features.Schedules
                 id,
                 s => s.Subject!,
                 s => s.PaymentType!,
-                s => s.BenefitType!,
-                s => s.BaseCost!);
+                s => s.BenefitType!);
             return entity == null ? null : _mapper.Map<ScheduleResponseDto>(entity);
         }
 
@@ -63,21 +59,13 @@ namespace Saturday_Back.Features.Schedules
 
             try
             {
-                var entities = await FetchRequiredEntitiesAsync(request);
+                var fields = await GetEntityFieldsAsync(request);
 
-                await ValidateNoDuplicateScheduleAsync(entities);
+                await ValidateNoDuplicateScheduleAsync(fields, request.StudyYear);
 
-                var cost = CalculateScheduleCost(request, entities);
+                var scheduleEntries = _scheduleEntriesGenerator.Generate(fields, request);
 
-                var entries = _entriesGenerator.Generate(
-                    cost,
-                    entities.PaymentType.Value,
-                    request.FirstMonth,
-                    request.LastMonth,
-                    entities.StudyYear
-                    );
-
-                var schedule = BuildScheduleEntity(request, entities, entries);
+                var schedule = BuildScheduleEntity(request, fields, scheduleEntries);
                 await _scheduleRepository.AddAsync(schedule);
 
                 await transaction.CommitAsync();
@@ -93,19 +81,19 @@ namespace Saturday_Back.Features.Schedules
 
         #region Validation
 
-        private async Task ValidateNoDuplicateScheduleAsync(ScheduleEntities entities)
+        private async Task ValidateNoDuplicateScheduleAsync(ScheduleFields entities, string studyYear)
         {
             var exists = await _scheduleRepository.FirstOrDefaultAsync(s =>
                 s.StudentId == entities.Student.Id &&
                 s.SubjectId == entities.Subject.Id &&
-                s.StudyYearId == entities.StudyYear.Id);
+                s.StudyYear == studyYear);
 
             if (exists != null)
             {
                 throw new InvalidOperationException(
                     $"Schedule already exists for student '{entities.Student.Identificator}' " +
                     $"in subject '{entities.Subject.Name}' " +
-                    $"for year '{entities.StudyYear.YearRange}'");
+                    $"for year '{studyYear}'");
             }
         }
 
@@ -113,86 +101,64 @@ namespace Saturday_Back.Features.Schedules
 
         #region Entity Fetching
 
-        private async Task<ScheduleEntities> FetchRequiredEntitiesAsync(ScheduleRequestDto request)
+        private async Task<ScheduleFields> GetEntityFieldsAsync(ScheduleRequestDto request)
         {
             // Fetch lookup data
-            var currentStudyYear = await _lookupService.GetStudyYearByRangeAsync(request.StudyYear);
             var subject = await _lookupService.GetSubjectByNameAsync(request.Subject);
             var benefitType = await _lookupService.GetBenefitTypeAsync(request.BenefitType);
             var paymentType = await _lookupService.GetPaymentTypeAsync(request.PaymentType);
 
             // Get or create student
-            var student = await GetOrCreateStudentAsync(request, currentStudyYear);
+            var student = await GetOrCreateStudentAsync(request);
 
-            // Get base cost for student's admission year
-            var baseCost = await _lookupService.GetBaseCostByYearAsync(student.AdmissionYear!);
-
-            return new ScheduleEntities
+            return new ScheduleFields
             {
-                StudyYear = currentStudyYear,
+                StudyYear = request.StudyYear,
                 Subject = subject,
                 BenefitType = benefitType,
                 PaymentType = paymentType,
                 Student = student,
-                BaseCost = baseCost
             };
         }
 
-        private async Task<Student> GetOrCreateStudentAsync(ScheduleRequestDto request, StudyYear admissionYear)
+        private async Task<Student> GetOrCreateStudentAsync(ScheduleRequestDto request)
         {
             var student = await _studentRepository
-                .FirstOrDefaultAsync(s => s.Identificator == request.Identificator);
+                .FirstOrDefaultAsync(s => s.Identificator == request.Identificator, s => s.AdmissionYear!);
 
             if (student == null)
             {
+                var currentAcademicYear = await _lookupService.GetAcademicYearByRangeAsync(request.StudyYear);
                 student = new Student
                 {
                     Identificator = request.Identificator,
                     FirstName = request.FirstName,
                     LastName = request.LastName,
-                    AdmissionYearId = admissionYear.Id,
+                    AdmissionYearId = currentAcademicYear.Id,
                 };
 
-                return await _studentRepository.AddAsync(student);
+                return await _studentRepository.AddAsync(student, s => s.AdmissionYear!);
             }
 
             return student;
         }
 
-        #endregion
-
-        #region Calculation
-        private decimal CalculateScheduleCost(ScheduleRequestDto request, ScheduleEntities entities)
-        {
-            if (entities.BaseCost.Cost == 0)
-            {
-                throw new InvalidOperationException("Base cost is 0. Please ensure the base cost is set correctly.");
-            }
-
-            var saturdaysCount = request.LastSaturday - request.FirstSaturday + 1;
-            var totalDiscount = entities.BenefitType.Discount + (entities.PaymentType.Discount ?? 0);
-            var discountedCost = entities.BaseCost.Cost * (1 - totalDiscount / 100);
-
-            return discountedCost * (saturdaysCount / 30);
-        }
-
-        #endregion
+        #endregion    
 
         #region Entity Building
 
-        private Schedule BuildScheduleEntity(
+        private static Schedule BuildScheduleEntity(
             ScheduleRequestDto request,
-            ScheduleEntities entities,
+            ScheduleFields entities,
             List<ScheduleEntry> entries)
         {
             return new Schedule
             {
-                StudyYearId = entities.StudyYear.Id,
+                StudyYear = request.StudyYear,
                 StudentId = entities.Student.Id,
                 SubjectId = entities.Subject.Id,
                 PaymentTypeId = entities.PaymentType.Id,
                 BenefitTypeId = entities.BenefitType.Id,
-                BaseCostId = entities.BaseCost.Id,
                 FirstSaturday = request.FirstSaturday,
                 LastSaturday = request.LastSaturday,
                 FirstMonth = request.FirstMonth,
@@ -205,17 +171,16 @@ namespace Saturday_Back.Features.Schedules
 
         #region Helper Classes
 
-        private class ScheduleEntities
+        public class ScheduleFields
         {
             public Student Student { get; set; } = null!;
             public Subject Subject { get; set; } = null!;
-            public StudyYear StudyYear { get; set; } = null!;
+            public string StudyYear { get; set; } = null!;
             public BenefitType BenefitType { get; set; } = null!;
             public PaymentType PaymentType { get; set; } = null!;
-            public BaseCost BaseCost { get; set; } = null!;
         }
 
-        #endregion
+        #endregion       
     }
 }
 

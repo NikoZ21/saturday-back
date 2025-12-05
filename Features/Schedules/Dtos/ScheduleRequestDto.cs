@@ -6,48 +6,43 @@ namespace Saturday_Back.Features.Schedules.Dtos
 {
     public class ScheduleRequestDto
     {
-        // Student information (will be created if doesn't exist)
+        // Must have information to create a schedule
         [Required]
         [StringLength(11, MinimumLength = 11)]
         public string Identificator { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(100)]
-        public string FirstName { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(100)]
-        public string LastName { get; set; } = string.Empty;
-
-        [Required]
-        public PaymentTypeValue PaymentType { get; set; }
-
-        [Required]
-        public BenefitTypeValue BenefitType { get; set; }
-
-        [Required]
         public string Subject { get; set; } = string.Empty;
 
         [Required]
-        [Range(1, 30)]
-        public int FirstSaturday { get; set; }
+        public string StudyYear { get; set; } = string.Empty;
 
-        [Required]
+
+        // Optional information
+        [StringLength(100)]
+        public string FirstName { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string LastName { get; set; } = string.Empty;
+
+        public PaymentTypeValue PaymentType { get; set; } = PaymentTypeValue.MONTHLY;
+
+        public BenefitTypeValue BenefitType { get; set; } = BenefitTypeValue.None;
+
+        [Range(1, 30)]
+        public int FirstSaturday { get; set; } = 1;
+
         [Range(1, 30)]
         [EnsureAfter("FirstSaturday")]
-        public int LastSaturday { get; set; }
+        public int LastSaturday { get; set; } = 30;
 
-        [Required]
         [Range(10, 17)]
-        public int FirstMonth { get; set; }
+        public int FirstMonth { get; set; } = 10;
 
-        [Required]
         [Range(10, 17)]
         [EnsureAfter("FirstMonth")]
-        public int LastMonth { get; set; }
+        public int LastMonth { get; set; } = 17;
 
-        [Required]
-        public string StudyYear { get; set; } = string.Empty;
     }
 }
 

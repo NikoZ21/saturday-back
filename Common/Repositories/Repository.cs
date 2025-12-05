@@ -35,10 +35,20 @@ namespace Saturday_Back.Common.Repositories
             return await ApplyIncludes(includes).Where(predicate).ToListAsync();
         }
 
-        public async Task<TEntity> AddAsync(TEntity entity)
+        public async Task<TEntity> AddAsync(TEntity entity, params Expression<Func<TEntity, object>>[] includes)
         {
             var addedEntity = await _dbContext.Set<TEntity>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
+
+            // If includes are provided, reload the entity with navigation properties
+            if (includes != null && includes.Length > 0)
+            {
+                var id = EF.Property<int>(addedEntity.Entity, "Id");
+                var reloaded = await ApplyIncludes(includes)
+                    .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+                return reloaded ?? addedEntity.Entity;
+            }
+
             return addedEntity.Entity;
         }
 
