@@ -20,5 +20,12 @@ When I ask a question in Agent mode:
 
 ## 3. Configuration Files
 
-- **NEVER modify configuration files** - do not configure or change `appsettings.json`, `appsettings.Development.json`, or any other configuration files
+- **NEVER modify configuration files** - do not configure or change `appsettings.json`, `appsettings.Development.json`, or any other configuration
+
+## 4. Mappings of Entities
+
+- **NEVER add seperate Profile** - do not create new Profile per entity we use centralized ApplicationMappingProfile.
+
+files
+
 - Configuration files contain sensitive data and environment-specific settings that should only be managed by the user

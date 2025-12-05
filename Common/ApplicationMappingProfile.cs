@@ -34,12 +34,6 @@ namespace Saturday_Back.Common
             CreateMap<SubjectRequestDto, Subject>();
             CreateMap<Subject, SubjectResponseDto>();
 
-            // BaseCost mappings
-            CreateMap<BaseCostRequestDto, BaseCost>();
-            CreateMap<BaseCost, BaseCostResponseDto>()
-                .ForMember(dest => dest.StudyYear,
-                    opt => opt.MapFrom(src => src.StudyYear != null ? src.StudyYear.YearRange : null));
-
             // // StudyYear mappings
             // CreateMap<StudyYearRequestDto, StudyYear>();
             // CreateMap<StudyYear, StudyYearResponseDto>();
@@ -58,9 +52,8 @@ namespace Saturday_Back.Common
                 .ForMember(dest => dest.PaymentType,
                           opt => opt.MapFrom(src => src.PaymentType != null ? src.PaymentType.Name : "default payment type"))
                 .ForMember(dest => dest.BenefitType,
-                          opt => opt.MapFrom(src => src.BenefitType != null ? src.BenefitType.Name : "default benefit type"))
-                .ForMember(dest => dest.BaseCost,
-                            opt => opt.MapFrom(src => src.BaseCost != null ? src.BaseCost.Cost : 0));
+                          opt => opt.MapFrom(src => src.BenefitType != null ? src.BenefitType.Name : "default benefit type"));
+
             CreateMap<ScheduleEntry, ScheduleEntryDto>();
 
 
