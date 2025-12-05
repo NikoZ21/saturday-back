@@ -43,7 +43,8 @@ namespace Saturday_Back.Common.Repositories
             // If includes are provided, reload the entity with navigation properties
             if (includes != null && includes.Length > 0)
             {
-                var id = EF.Property<int>(addedEntity.Entity, "Id");
+                var idProperty = typeof(TEntity).GetProperty("Id");
+                var id = (int)idProperty?.GetValue(addedEntity.Entity)!;
                 var reloaded = await ApplyIncludes(includes)
                     .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
                 return reloaded ?? addedEntity.Entity;

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Saturday_Back.Features.Students;
 
 namespace Saturday_Back.Features.AcademicYears
 {
@@ -7,6 +8,7 @@ namespace Saturday_Back.Features.AcademicYears
         public int Id { get; set; }
         public YearRangeValue Range { get; private set; } = default!;
         public decimal Cost { get; set; }
+        public ICollection<Student> Students { get; set; } = new List<Student>();
 
         [NotMapped] public int StartYear => Range.StartYear;
         [NotMapped] public int EndYear => Range.EndYear;

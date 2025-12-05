@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Saturday_Back.Features.AcademicYears;
-using Saturday_Back.Features.BaseCosts;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
 using Saturday_Back.Features.Schedules;
 using Saturday_Back.Features.Students;
-using Saturday_Back.Features.StudyYears;
 using Saturday_Back.Features.Subjects;
 using System.Reflection;
 
@@ -21,8 +19,6 @@ namespace Saturday_Back.Common.Database
         public DbSet<PaymentType> PaymentTypes => Set<PaymentType>();
         public DbSet<BenefitType> BenefitTypes => Set<BenefitType>();
         public DbSet<Subject> Subjects => Set<Subject>();
-        public DbSet<BaseCost> BaseCosts => Set<BaseCost>();
-        public DbSet<StudyYear> StudyYears => Set<StudyYear>();
         public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
         public DbSet<Student> Students => Set<Student>();
         public DbSet<Schedule> Schedules => Set<Schedule>();

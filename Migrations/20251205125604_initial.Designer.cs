@@ -11,8 +11,8 @@ using Saturday_Back.Common.Database;
 namespace Saturday_Back.Migrations
 {
     [DbContext(typeof(FssDbContext))]
-    [Migration("20251202073716_studyyearupgraded")]
-    partial class studyyearupgraded
+    [Migration("20251205125604_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace Saturday_Back.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Saturday_Back.Features.BaseCosts.BaseCost", b =>
+            modelBuilder.Entity("Saturday_Back.Features.AcademicYears.AcademicYear", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,15 +38,21 @@ namespace Saturday_Back.Migrations
                         .HasColumnType("decimal(10,2)")
                         .HasColumnName("cost");
 
-                    b.Property<int>("StudyYearId")
-                        .HasColumnType("int")
-                        .HasColumnName("study_year_id");
+                    b.Property<string>("Range")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("varchar(9)")
+                        .HasColumnName("year_range");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudyYearId");
+                    b.HasIndex("Range")
+                        .IsUnique();
 
-                    b.ToTable("base_costs", (string)null);
+                    b.ToTable("academic_years", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AcademicYear_YearRange_Format", "`year_range` REGEXP '^[0-9]{4}-[0-9]{4}$'");
+                        });
                 });
 
             modelBuilder.Entity("Saturday_Back.Features.BenefitTypes.BenefitType", b =>
@@ -118,10 +124,6 @@ namespace Saturday_Back.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BaseCostId")
-                        .HasColumnType("int")
-                        .HasColumnName("basecostid");
-
                     b.Property<int>("BenefitTypeId")
                         .HasColumnType("int")
                         .HasColumnName("benefittypeid");
@@ -155,9 +157,11 @@ namespace Saturday_Back.Migrations
                         .HasColumnType("int")
                         .HasColumnName("studentid");
 
-                    b.Property<int>("StudyYearId")
-                        .HasColumnType("int")
-                        .HasColumnName("studyyearid");
+                    b.Property<string>("StudyYear")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("char(9)")
+                        .HasColumnName("studyyear");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("int")
@@ -165,15 +169,11 @@ namespace Saturday_Back.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BaseCostId");
-
                     b.HasIndex("BenefitTypeId");
 
                     b.HasIndex("PaymentTypeId");
 
                     b.HasIndex("StudentId");
-
-                    b.HasIndex("StudyYearId");
 
                     b.HasIndex("SubjectId");
 
@@ -221,29 +221,6 @@ namespace Saturday_Back.Migrations
                     b.ToTable("students", (string)null);
                 });
 
-            modelBuilder.Entity("Saturday_Back.Features.StudyYears.StudyYear", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("rec_id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Range")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("year_range");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("study_years", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_StudyYear_YearRange_Format", "`yearrange` REGEXP '^[0-9]{4}-[0-9]{4}$'");
-                        });
-                });
-
             modelBuilder.Entity("Saturday_Back.Features.Subjects.Subject", b =>
                 {
                     b.Property<int>("Id")
@@ -267,25 +244,8 @@ namespace Saturday_Back.Migrations
                     b.ToTable("subjects", (string)null);
                 });
 
-            modelBuilder.Entity("Saturday_Back.Features.BaseCosts.BaseCost", b =>
-                {
-                    b.HasOne("Saturday_Back.Features.StudyYears.StudyYear", "StudyYear")
-                        .WithMany()
-                        .HasForeignKey("StudyYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("StudyYear");
-                });
-
             modelBuilder.Entity("Saturday_Back.Features.Schedules.Schedule", b =>
                 {
-                    b.HasOne("Saturday_Back.Features.BaseCosts.BaseCost", "BaseCost")
-                        .WithMany()
-                        .HasForeignKey("BaseCostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Saturday_Back.Features.BenefitTypes.BenefitType", "BenefitType")
                         .WithMany()
                         .HasForeignKey("BenefitTypeId")
@@ -304,19 +264,11 @@ namespace Saturday_Back.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Saturday_Back.Features.StudyYears.StudyYear", "StudyYear")
-                        .WithMany()
-                        .HasForeignKey("StudyYearId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Saturday_Back.Features.Subjects.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("BaseCost");
 
                     b.Navigation("BenefitType");
 
@@ -324,14 +276,12 @@ namespace Saturday_Back.Migrations
 
                     b.Navigation("Student");
 
-                    b.Navigation("StudyYear");
-
                     b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Saturday_Back.Features.Students.Student", b =>
                 {
-                    b.HasOne("Saturday_Back.Features.StudyYears.StudyYear", "AdmissionYear")
+                    b.HasOne("Saturday_Back.Features.AcademicYears.AcademicYear", "AdmissionYear")
                         .WithMany("Students")
                         .HasForeignKey("AdmissionYearId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -340,7 +290,7 @@ namespace Saturday_Back.Migrations
                     b.Navigation("AdmissionYear");
                 });
 
-            modelBuilder.Entity("Saturday_Back.Features.StudyYears.StudyYear", b =>
+            modelBuilder.Entity("Saturday_Back.Features.AcademicYears.AcademicYear", b =>
                 {
                     b.Navigation("Students");
                 });

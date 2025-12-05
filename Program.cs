@@ -2,13 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Saturday_Back.Common.Database;
 using Saturday_Back.Common.Repositories;
 using Saturday_Back.Features.AcademicYears;
-using Saturday_Back.Features.BaseCosts;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
 using Saturday_Back.Features.Subjects;
 using Saturday_Back.Features.Schedules;
 using Saturday_Back.Features.Students;
-using Saturday_Back.Features.StudyYears;
 using Scalar.AspNetCore;
 using Saturday_Back.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -61,10 +59,6 @@ builder.Services.AddCachedRepoWithService<BenefitType, BenefitTypeService>(
     cacheKey: "BenefitTypesCache");
 builder.Services.AddCachedRepoWithService<Subject, SubjectService>(
     cacheKey: "SubjectsCache");
-builder.Services.AddCachedRepoWithService<BaseCost, BaseCostService>(
-    cacheKey: "BaseCostsCache");
-builder.Services.AddCachedRepoWithService<StudyYear, StudyYearService>(
-    cacheKey: "StudyYearsCache");
 builder.Services.AddCachedRepoWithService<AcademicYear, AcademicYearService>(
     cacheKey: "AcademicYearsCache");
 

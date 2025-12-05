@@ -6,12 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Saturday_Back.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "academic_years",
+                columns: table => new
+                {
+                    rec_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    year_range = table.Column<string>(type: "varchar(9)", maxLength: 9, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    cost = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_academic_years", x => x.rec_id);
+                    table.CheckConstraint("CK_AcademicYear_YearRange_Format", "`year_range` REGEXP '^[0-9]{4}-[0-9]{4}$'");
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -51,22 +68,6 @@ namespace Saturday_Back.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "study_years",
-                columns: table => new
-                {
-                    rec_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    yearrange = table.Column<string>(type: "varchar(9)", maxLength: 9, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_study_years", x => x.rec_id);
-                    table.CheckConstraint("CK_StudyYear_YearRange_Format", "`yearrange` REGEXP '^[0-9]{4}-[0-9]{4}$'");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "subjects",
                 columns: table => new
                 {
@@ -78,27 +79,6 @@ namespace Saturday_Back.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_subjects", x => x.rec_id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "base_costs",
-                columns: table => new
-                {
-                    rec_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    study_year_id = table.Column<int>(type: "int", nullable: false),
-                    cost = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_base_costs", x => x.rec_id);
-                    table.ForeignKey(
-                        name: "FK_base_costs_study_years_study_year_id",
-                        column: x => x.study_year_id,
-                        principalTable: "study_years",
-                        principalColumn: "rec_id",
-                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -120,9 +100,9 @@ namespace Saturday_Back.Migrations
                 {
                     table.PrimaryKey("PK_students", x => x.rec_id);
                     table.ForeignKey(
-                        name: "FK_students_study_years_admissionyearid",
+                        name: "FK_students_academic_years_admissionyearid",
                         column: x => x.admissionyearid,
-                        principalTable: "study_years",
+                        principalTable: "academic_years",
                         principalColumn: "rec_id",
                         onDelete: ReferentialAction.Restrict);
                 })
@@ -134,28 +114,22 @@ namespace Saturday_Back.Migrations
                 {
                     rec_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    studyyearid = table.Column<int>(type: "int", nullable: false),
                     studentid = table.Column<int>(type: "int", nullable: false),
                     subjectid = table.Column<int>(type: "int", nullable: false),
                     paymenttypeid = table.Column<int>(type: "int", nullable: false),
                     benefittypeid = table.Column<int>(type: "int", nullable: false),
-                    basecostid = table.Column<int>(type: "int", nullable: false),
                     firstsaturday = table.Column<int>(type: "int", nullable: false),
                     lastsaturday = table.Column<int>(type: "int", nullable: false),
                     firstmonth = table.Column<int>(type: "int", nullable: false),
                     lastmonth = table.Column<int>(type: "int", nullable: false),
+                    studyyear = table.Column<string>(type: "char(9)", maxLength: 9, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     schedule_entries = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_schedules", x => x.rec_id);
-                    table.ForeignKey(
-                        name: "FK_schedules_base_costs_basecostid",
-                        column: x => x.basecostid,
-                        principalTable: "base_costs",
-                        principalColumn: "rec_id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_schedules_benefit_types_benefittypeid",
                         column: x => x.benefittypeid,
@@ -175,12 +149,6 @@ namespace Saturday_Back.Migrations
                         principalColumn: "rec_id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_schedules_study_years_studyyearid",
-                        column: x => x.studyyearid,
-                        principalTable: "study_years",
-                        principalColumn: "rec_id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_schedules_subjects_subjectid",
                         column: x => x.subjectid,
                         principalTable: "subjects",
@@ -190,14 +158,10 @@ namespace Saturday_Back.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_base_costs_study_year_id",
-                table: "base_costs",
-                column: "study_year_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_schedules_basecostid",
-                table: "schedules",
-                column: "basecostid");
+                name: "IX_academic_years_year_range",
+                table: "academic_years",
+                column: "year_range",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_schedules_benefittypeid",
@@ -213,11 +177,6 @@ namespace Saturday_Back.Migrations
                 name: "IX_schedules_studentid",
                 table: "schedules",
                 column: "studentid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_schedules_studyyearid",
-                table: "schedules",
-                column: "studyyearid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_schedules_subjectid",
@@ -236,12 +195,6 @@ namespace Saturday_Back.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_study_years_yearrange",
-                table: "study_years",
-                column: "yearrange",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_subjects_name",
                 table: "subjects",
                 column: "name",
@@ -253,9 +206,6 @@ namespace Saturday_Back.Migrations
         {
             migrationBuilder.DropTable(
                 name: "schedules");
-
-            migrationBuilder.DropTable(
-                name: "base_costs");
 
             migrationBuilder.DropTable(
                 name: "benefit_types");
@@ -270,7 +220,7 @@ namespace Saturday_Back.Migrations
                 name: "subjects");
 
             migrationBuilder.DropTable(
-                name: "study_years");
+                name: "academic_years");
         }
     }
 }
