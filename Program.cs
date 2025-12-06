@@ -11,6 +11,7 @@ using Scalar.AspNetCore;
 using Saturday_Back.Common;
 using Microsoft.AspNetCore.Mvc;
 using Saturday_Back.Common.Middleware;
+using Saturday_Back.Features.Schedules.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,8 +68,8 @@ builder.Services.AddCachedRepoWithService<AcademicYear, AcademicYearService>(
 builder.Services.AddScoped<StudentService>();
 
 // Register schedule-related services
-builder.Services.AddScoped<ScheduleLookupService>();
-builder.Services.AddScoped<ScheduleEntriesGenerator>();
+builder.Services.AddScoped<IScheduleFieldResolver, ScheduleFieldResolver>();
+builder.Services.AddScoped<IScheduleEntriesResolver, ScheduleEntriesResolver>();
 builder.Services.AddScoped<ScheduleService>();
 
 // OpenAPI/Swagger

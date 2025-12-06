@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Saturday_Back.Common.Exceptions;
 using Saturday_Back.Features.Schedules.Dtos;
 
 namespace Saturday_Back.Features.Schedules
@@ -31,7 +32,7 @@ namespace Saturday_Back.Features.Schedules
                     .FirstOrDefault();
 
                 if (firstError != null)
-                    return BadRequest(firstError.ErrorMessage);
+                    throw new ValidationException(firstError.ErrorMessage);
             }
 
             var result = await _service.CreateScheduleAsync(request);

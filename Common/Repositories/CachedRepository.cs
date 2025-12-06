@@ -26,6 +26,10 @@ namespace Saturday_Back.Common.Repositories
                 return await ApplyIncludes(includes).AsNoTracking().ToListAsync();
             });
         }
+        public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        {
+            return await ApplyIncludes(includes).FirstOrDefaultAsync(predicate);
+        }
 
         public async Task<TEntity> AddAsync(TEntity entity)
         {
@@ -68,6 +72,8 @@ namespace Saturday_Back.Common.Repositories
 
             return query;
         }
+
+
     }
 }
 

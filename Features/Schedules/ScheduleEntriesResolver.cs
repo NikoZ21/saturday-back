@@ -4,6 +4,8 @@ using Saturday_Back.Features.Schedules.Dtos;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
 using static Saturday_Back.Features.Schedules.ScheduleService;
+using Saturday_Back.Common.Exceptions;
+using Saturday_Back.Features.Schedules.Interfaces;
 
 namespace Saturday_Back.Features.Schedules
 {
@@ -11,7 +13,7 @@ namespace Saturday_Back.Features.Schedules
     /// Generates payment schedule entries based on payment type and date range.
     /// Factory class responsible for creating different payment schedules.
     /// </summary>
-    public class ScheduleEntriesGenerator
+    public class ScheduleEntriesResolver : IScheduleEntriesResolver
     {
         private readonly int paymentDay = 4;
 
@@ -23,7 +25,7 @@ namespace Saturday_Back.Features.Schedules
         /// <param name="firstMonth">Starting month (1-12)</param>
         /// <param name="lastMonth">Ending month (1-12)</param>
         /// <returns>List of schedule entries with dates and costs</returns>
-        public List<ScheduleEntry> Generate(
+        public List<ScheduleEntry> ResolveEntriesAsync(
            ScheduleFields fields, ScheduleRequestDto request
             )
         {
@@ -40,7 +42,7 @@ namespace Saturday_Back.Features.Schedules
                 PaymentTypeValue.ONETIME => GenerateSinglePayment(totalCost, firstMonth, academicYear),
                 PaymentTypeValue.TWOTIME => GenerateTwoPartPayment(totalCost, firstMonth, lastMonth, academicYear),
                 PaymentTypeValue.MONTHLY => GenerateMonthlyPayments(totalCost, firstMonth, lastMonth, academicYear),
-                _ => throw new ArgumentException($"Invalid payment type: {paymentType}", nameof(paymentType))
+                _ => throw new BusinessRuleException($"Invalid payment type: {paymentType}" + $" {nameof(paymentType)}")
             };
 
             return entries.ToList();
@@ -75,9 +77,8 @@ namespace Saturday_Back.Features.Schedules
             var monthsCount = lastMonth - firstMonth;
 
             if (monthsCount <= 0)
-                throw new ArgumentException(
-                    $"Last month ({lastMonth}) must be after first month ({firstMonth})",
-                    nameof(lastMonth));
+                throw new BusinessRuleException(
+                    $"Last month ({lastMonth}) must be after first month ({firstMonth})");
 
             var monthlyPayment = totalCost / monthsCount;
             var scheduleEntries = new ScheduleEntry[monthsCount];
@@ -114,7 +115,7 @@ namespace Saturday_Back.Features.Schedules
         {
             if (cost == 0)
             {
-                throw new InvalidOperationException("Base cost is 0. Please ensure the base cost is set correctly.");
+                throw new BusinessRuleException("Base cost is 0. Please ensure the base cost is set correctly.");
             }
 
             var saturdaysCount = lastSaturday - firstSaturday + 1;
