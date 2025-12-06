@@ -10,6 +10,7 @@ using Saturday_Back.Features.Students;
 using Scalar.AspNetCore;
 using Saturday_Back.Common;
 using Microsoft.AspNetCore.Mvc;
+using Saturday_Back.Common.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +81,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
