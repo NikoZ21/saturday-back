@@ -9,10 +9,12 @@ namespace Saturday_Back.Features.Schedules
     public class ScheduleController : ControllerBase
     {
         private readonly ScheduleService _service;
+        private readonly ILogger<ScheduleController> _logger;
 
-        public ScheduleController(ScheduleService service)
+        public ScheduleController(ScheduleService service, ILogger<ScheduleController> logger)
         {
             _service = service;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -34,6 +36,8 @@ namespace Saturday_Back.Features.Schedules
                 if (firstError != null)
                     throw new ValidationException(firstError.ErrorMessage);
             }
+
+            _logger.LogInformation("Creating schedule for request: {@Request}", request);
 
             var result = await _service.CreateScheduleAsync(request);
             return Ok("created successfully");

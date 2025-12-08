@@ -12,8 +12,13 @@ using Saturday_Back.Common;
 using Microsoft.AspNetCore.Mvc;
 using Saturday_Back.Common.Middleware;
 using Saturday_Back.Features.Schedules.Interfaces;
+using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 // Database
 builder.Services.AddDbContext<FssDbContext>(options =>
@@ -21,6 +26,7 @@ builder.Services.AddDbContext<FssDbContext>(options =>
         builder.Configuration.GetConnectionString("DevelopmentDb"),
         new MySqlServerVersion(new Version(8, 0, 44)
     )));
+
 
 // Generic repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -82,6 +88,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseSerilogRequestLogging();
+
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 

@@ -21,13 +21,16 @@ namespace Saturday_Back.Features.Schedules
         private readonly ScheduleFactory _scheduleFactory;
         private readonly FssDbContext _dbContext;
 
+        private readonly ILogger<ScheduleService> _logger;
+
         public ScheduleService(
             IRepository<Schedule> scheduleRepository,
             IRepository<Student> studentRepository,
             IScheduleFieldResolver fieldResolver,
             IScheduleEntriesResolver entriesResolver,
             FssDbContext dbContext,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<ScheduleService> logger)
         {
             _scheduleRepository = scheduleRepository;
             _studentRepository = studentRepository;
@@ -36,6 +39,7 @@ namespace Saturday_Back.Features.Schedules
             _dbContext = dbContext;
             _mapper = mapper;
             _scheduleFactory = new ScheduleFactory();
+            _logger = logger;
         }
 
         public async Task<List<ScheduleResponseDto>> GetAllAsync()
@@ -70,13 +74,19 @@ namespace Saturday_Back.Features.Schedules
                     BenefitType = await _fieldResolver.ResolveBenefitTypeAsync(request),
                     PaymentType = await _fieldResolver.ResolvePaymentTypeAsync(request),
                 };
+                _logger.LogInformation("Resolved fields: {@Fields}", fields);
 
                 await ValidateNoDuplicateScheduleAsync(fields, request.StudyYear);
+                _logger.LogInformation("Validated no duplicate schedule");
 
                 var scheduleEntries = _scheduleEntriesResolver.ResolveEntriesAsync(fields, request);
+                _logger.LogInformation("Resolved schedule entries: {@ScheduleEntries}", scheduleEntries);
 
                 var schedule = _scheduleFactory.Create(request, fields, scheduleEntries);
+                _logger.LogInformation("Created schedule}");
+
                 await _scheduleRepository.AddAsync(schedule);
+                _logger.LogInformation("Added schedule to database");
 
                 await transaction.CommitAsync();
 
@@ -85,7 +95,7 @@ namespace Saturday_Back.Features.Schedules
             catch
             {
                 await transaction.RollbackAsync();
-                throw;
+                throw new BusinessRuleException("Failed to create schedule");
             }
         }
 
