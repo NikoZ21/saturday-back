@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
 
 namespace Saturday_Back.Common.Database
 {
@@ -17,7 +16,7 @@ namespace Saturday_Back.Common.Database
                 .AddJsonFile("appsettings.Development.json", optional: true)
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("DevelopmentDb");
+            var connectionString = configuration.GetConnectionString("database");
 
             optionsBuilder.UseMySql(
                 connectionString,

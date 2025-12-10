@@ -17,13 +17,17 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine("Environment: " + builder.Environment.EnvironmentName);
+Console.WriteLine("DevelopmentDb connection string: " + builder.Configuration.GetConnectionString("DevelopmentDb"));
+Console.WriteLine("Logging:LogLevel:Default: " + builder.Configuration["Logging:LogLevel:Default"]);
+
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
 // Database
 builder.Services.AddDbContext<FssDbContext>(options =>
     options.UseMySql(
-        builder.Configuration.GetConnectionString("DevelopmentDb"),
+        builder.Configuration.GetConnectionString("Database"),
         new MySqlServerVersion(new Version(8, 0, 44)
     )));
 
@@ -87,6 +91,46 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        var context = services.GetRequiredService<FssDbContext>();
+
+        logger.LogInformation("Checking for pending database migrations...");
+
+        var pendingMigrations = context.Database.GetPendingMigrations().ToList();
+
+        if (pendingMigrations.Any())
+        {
+            logger.LogWarning("Found {Count} pending migration(s). Applying now...", pendingMigrations.Count);
+
+            foreach (var migration in pendingMigrations)
+            {
+                logger.LogInformation("  - {Migration}", migration);
+            }
+
+            context.Database.Migrate();
+
+            logger.LogInformation("✅ Database migrations applied successfully");
+        }
+        else
+        {
+            logger.LogInformation("✅ Database is up to date. No migrations needed.");
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "❌ An error occurred while migrating the database");
+
+        // Stop the application if migration fails
+        throw;
+    }
 }
 
 app.UseSerilogRequestLogging();

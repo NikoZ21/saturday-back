@@ -11,7 +11,7 @@ using Saturday_Back.Common.Database;
 namespace Saturday_Back.Migrations
 {
     [DbContext(typeof(FssDbContext))]
-    [Migration("20251205125604_initial")]
+    [Migration("20251210110950_initial")]
     partial class initial
     {
         /// <inheritdoc />
