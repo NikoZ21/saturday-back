@@ -5,12 +5,11 @@ using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.BenefitTypes.Dtos;
 using Saturday_Back.Features.PaymentTypes;
 using Saturday_Back.Features.PaymentTypes.Dtos;
+using Saturday_Back.Features.ScheduleEntries;
 using Saturday_Back.Features.Schedules;
 using Saturday_Back.Features.Schedules.Dtos;
 using Saturday_Back.Features.Students;
 using Saturday_Back.Features.Students.Dtos;
-// using Saturday_Back.Features.StudyYears;
-// using Saturday_Back.Features.StudyYears.Dtos;
 using Saturday_Back.Features.Subjects;
 using Saturday_Back.Features.Subjects.Dtos;
 
@@ -43,8 +42,7 @@ namespace Saturday_Back.Common
                           opt => opt.MapFrom(src => src.PaymentType != null ? src.PaymentType.Name : "default payment type"))
                 .ForMember(dest => dest.BenefitType,
                           opt => opt.MapFrom(src => src.BenefitType != null ? src.BenefitType.Name : "default benefit type"));
-            // ScheduleEntry mappings
-            CreateMap<ScheduleEntry, ScheduleEntryDto>();
+            CreateMap<ScheduleEntry, ScheduleEntryResponseDto>();
             // AcademicYear mappings
             CreateMap<AcademicYearRequestDto, AcademicYear>()
                           .ForMember(dest => dest.Range,
@@ -56,7 +54,6 @@ namespace Saturday_Back.Common
                     opt => opt.MapFrom(src => src.StartYear))
                 .ForMember(dest => dest.EndYear,
                     opt => opt.MapFrom(src => src.EndYear));
-
         }
     }
 }

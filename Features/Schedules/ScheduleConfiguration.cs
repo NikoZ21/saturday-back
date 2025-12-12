@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Text.Json;
 
 namespace Saturday_Back.Features.Schedules
 {
@@ -43,15 +42,6 @@ namespace Saturday_Back.Features.Schedules
                   entity.Property(s => s.LastSaturday).IsRequired();
                   entity.Property(s => s.FirstMonth).IsRequired();
                   entity.Property(s => s.LastMonth).IsRequired();
-
-                  // Convert ScheduleEntries list → JSON column in MySQL
-                  entity.Property(s => s.ScheduleEntries)
-                        .HasConversion(
-                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                            v => JsonSerializer.Deserialize<List<ScheduleEntry>>(v, (JsonSerializerOptions?)null) ?? new()
-                        )
-                        .HasColumnName("schedule_entries")
-                        .HasColumnType("json");
             }
       }
 }

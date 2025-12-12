@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Saturday_Back.Features.AcademicYears;
 using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
+using Saturday_Back.Features.ScheduleEntries;
 using Saturday_Back.Features.Schedules;
 using Saturday_Back.Features.Students;
 using Saturday_Back.Features.Subjects;
@@ -22,6 +23,7 @@ namespace Saturday_Back.Common.Database
         public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
         public DbSet<Student> Students => Set<Student>();
         public DbSet<Schedule> Schedules => Set<Schedule>();
+        public DbSet<ScheduleEntry> ScheduleEntries => Set<ScheduleEntry>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

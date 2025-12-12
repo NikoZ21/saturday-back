@@ -11,14 +11,14 @@ namespace Saturday_Back.Features.Schedules.Dtos
         public int LastSaturday { get; set; }
         public int FirstMonth { get; set; }
         public int LastMonth { get; set; }
-        public List<ScheduleEntryDto> ScheduleEntries { get; set; } = [];
+        public string StudyYear { get; set; } = string.Empty;
+        public List<ScheduleEntryResponseDto> ScheduleEntries { get; set; } = [];
+    }
+    public class ScheduleEntryResponseDto
+    {
+        public string Date { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
     }
 
-    public class ScheduleEntryDto
-    {
-        public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public decimal Cost { get; set; }
-    }
 }
 

@@ -7,8 +7,7 @@ namespace Saturday_Back.Features.Schedules
     {
         public Schedule Create(
             ScheduleRequestDto request,
-            ScheduleFields fields,
-            List<ScheduleEntry> entries)
+            ScheduleFields fields)
         {
             return new Schedule
             {
@@ -21,7 +20,6 @@ namespace Saturday_Back.Features.Schedules
                 LastSaturday = request.LastSaturday,
                 FirstMonth = request.FirstMonth,
                 LastMonth = request.LastMonth,
-                ScheduleEntries = entries
             };
         }
     }

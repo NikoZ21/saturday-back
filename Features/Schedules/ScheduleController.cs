@@ -18,10 +18,10 @@ namespace Saturday_Back.Features.Schedules
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ScheduleResponseDto>>> GetAll()
+        public async Task<ActionResult<Schedule>> GetAll()
         {
             var schedules = await _service.GetAllAsync();
-            return Ok(schedules);
+            return Ok(schedules[0]);
         }
 
         [HttpPost]
@@ -40,7 +40,7 @@ namespace Saturday_Back.Features.Schedules
             _logger.LogInformation("Creating schedule for request: {@Request}", request);
 
             var result = await _service.CreateScheduleAsync(request);
-            return Ok("created successfully");
+            return Ok(result);
         }
     }
 }

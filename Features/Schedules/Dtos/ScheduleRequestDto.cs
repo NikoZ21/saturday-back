@@ -25,9 +25,9 @@ namespace Saturday_Back.Features.Schedules.Dtos
         [StringLength(100)]
         public string LastName { get; set; } = string.Empty;
 
-        public PaymentTypeValue PaymentType { get; set; } = PaymentTypeValue.MONTHLY;
+        public string PaymentType { get; set; } = "MONTHLY";
 
-        public BenefitTypeValue BenefitType { get; set; } = BenefitTypeValue.None;
+        public string BenefitType { get; set; } = "None";
 
         [Range(1, 30)]
         public int FirstSaturday { get; set; } = 1;

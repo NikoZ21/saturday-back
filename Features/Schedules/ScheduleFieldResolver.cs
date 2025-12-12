@@ -1,3 +1,4 @@
+using Saturday_Back.Common.Enums;
 using Saturday_Back.Common.Exceptions;
 using Saturday_Back.Common.Repositories;
 using Saturday_Back.Features.AcademicYears;
@@ -61,13 +62,27 @@ namespace Saturday_Back.Features.Schedules
         }
         public async Task<PaymentType> ResolvePaymentTypeAsync(ScheduleRequestDto request)
         {
-            var paymentType = await _paymentTypeRepository.FirstOrDefaultAsync(pt => pt.Value == request.PaymentType) ??
+            if (!Enum.TryParse<PaymentTypeValue>(request.PaymentType, ignoreCase: true, out var paymentTypeValue))
+            {
+                throw new BusinessRuleException(
+                    $"Invalid BenefitType value '{request.BenefitType}'. " +
+                    $"Valid values are: {string.Join(", ", Enum.GetNames<BenefitTypeValue>())}");
+            }
+
+            var paymentType = await _paymentTypeRepository.FirstOrDefaultAsync(pt => pt.Value == paymentTypeValue) ??
             throw new BusinessRuleException($"Payment type '{request.PaymentType}' not found. Please ensure the payment type exists in the system.");
             return paymentType;
         }
         public async Task<BenefitType> ResolveBenefitTypeAsync(ScheduleRequestDto request)
         {
-            var benefitType = await _benefitTypeRepository.FirstOrDefaultAsync(bt => bt.Value == request.BenefitType) ??
+            if (!Enum.TryParse<BenefitTypeValue>(request.BenefitType, ignoreCase: true, out var benefitTypeValue))
+            {
+                throw new BusinessRuleException(
+                    $"Invalid BenefitType value '{request.BenefitType}'. " +
+                    $"Valid values are: {string.Join(", ", Enum.GetNames<BenefitTypeValue>())}");
+            }
+
+            var benefitType = await _benefitTypeRepository.FirstOrDefaultAsync(bt => bt.Value == benefitTypeValue) ??
             throw new BusinessRuleException($"Benefit type '{request.BenefitType}' not found. Please ensure the benefit type exists in the system.");
             return benefitType;
         }

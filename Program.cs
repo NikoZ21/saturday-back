@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Saturday_Back.Common.Middleware;
 using Saturday_Back.Features.Schedules.Interfaces;
 using Serilog;
+using Saturday_Back.Features.ScheduleEntries;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,7 +80,8 @@ builder.Services.AddScoped<StudentService>();
 
 // Register schedule-related services
 builder.Services.AddScoped<IScheduleFieldResolver, ScheduleFieldResolver>();
-builder.Services.AddScoped<IScheduleEntriesResolver, ScheduleEntriesResolver>();
+
+builder.Services.AddScoped<ScheduleEntriesService>();
 builder.Services.AddScoped<ScheduleService>();
 
 // OpenAPI/Swagger

@@ -2,7 +2,7 @@ using Saturday_Back.Features.BenefitTypes;
 using Saturday_Back.Features.PaymentTypes;
 using Saturday_Back.Features.Subjects;
 using Saturday_Back.Features.Students;
-
+using Saturday_Back.Features.ScheduleEntries;
 
 namespace Saturday_Back.Features.Schedules
 {
@@ -27,14 +27,9 @@ namespace Saturday_Back.Features.Schedules
         public int FirstMonth { get; set; }
         public int LastMonth { get; set; }
         public string? StudyYear { get; set; }
-        public List<ScheduleEntry> ScheduleEntries { get; set; } = [];
-    }
 
-    public class ScheduleEntry
-    {
-        public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public decimal Cost { get; set; }
+        // Navigation property - one Schedule has many ScheduleEntries
+        public List<ScheduleEntry> ScheduleEntries { get; set; } = [];
     }
 }
 
