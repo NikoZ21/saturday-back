@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Saturday_Back.Common.Enums;
 using Saturday_Back.Common.Exceptions;
 using Saturday_Back.Common.Repositories;
@@ -18,7 +19,7 @@ namespace Saturday_Back.Features.ScheduleEntries
             return await _scheduleEntryRepository.WhereAsync(e => e.ScheduleId == scheduleId);
         }
 
-        public async Task CreateAsync(int recId, PaymentType paymentType, BenefitType benefitType, AcademicYear academicYear, int firstSaturday, int lastSaturday, int firstMonth, int lastMonth)
+        public async Task<List<ScheduleEntry>> CreateAsync(int recId, PaymentType paymentType, BenefitType benefitType, AcademicYear academicYear, int firstSaturday, int lastSaturday, int firstMonth, int lastMonth)
         {
             var cost = CalculateCost(academicYear.Cost, firstSaturday, lastSaturday, paymentType, benefitType);
 
@@ -30,11 +31,15 @@ namespace Saturday_Back.Features.ScheduleEntries
                 _ => throw new BusinessRuleException($"Invalid payment type: {paymentType}" + $" {nameof(paymentType)}")
             };
 
+            List<ScheduleEntry> addedEntries = [];
+
             foreach (var entry in entries)
             {
                 entry.ScheduleId = recId;
-                await _scheduleEntryRepository.AddAsync(entry);
+                var addedEntry = await _scheduleEntryRepository.AddAsync(entry);
+                addedEntries.Add(addedEntry);
             }
+            return addedEntries;
         }
         /// <summary>
         /// Generates a single payment entry for one-time payment.

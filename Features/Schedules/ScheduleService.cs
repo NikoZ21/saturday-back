@@ -70,7 +70,8 @@ namespace Saturday_Back.Features.Schedules
                 var addedSchedule = await _scheduleRepository.AddAsync(schedule, s => s.ScheduleEntries);
                 _logger.LogInformation("Added schedule to database");
 
-                await _scheduleEntriesService.CreateAsync(addedSchedule.Id, fields.PaymentType, fields.BenefitType, fields.Student.AdmissionYear!, request.FirstSaturday, request.LastSaturday, request.FirstMonth, request.LastMonth);
+                var addedEntries = await _scheduleEntriesService.CreateAsync(addedSchedule.Id, fields.PaymentType, fields.BenefitType, fields.Student.AdmissionYear!, request.FirstSaturday, request.LastSaturday, request.FirstMonth, request.LastMonth);
+                addedSchedule.ScheduleEntries = addedEntries;
 
                 await transaction.CommitAsync();
 

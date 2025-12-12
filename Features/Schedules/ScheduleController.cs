@@ -18,7 +18,7 @@ namespace Saturday_Back.Features.Schedules
         }
 
         [HttpGet]
-        public async Task<ActionResult<Schedule>> GetAll()
+        public async Task<ActionResult<ScheduleResponseDto>> GetAll()
         {
             var schedules = await _service.GetAllAsync();
             return Ok(schedules[0]);
