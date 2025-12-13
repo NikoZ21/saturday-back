@@ -83,6 +83,7 @@ builder.Services.AddScoped<IScheduleFieldResolver, ScheduleFieldResolver>();
 
 builder.Services.AddScoped<ScheduleEntriesService>();
 builder.Services.AddScoped<ScheduleService>();
+builder.Services.AddScoped<GoogleSheetFieldsService>();
 
 // OpenAPI/Swagger
 builder.Services.AddOpenApi();

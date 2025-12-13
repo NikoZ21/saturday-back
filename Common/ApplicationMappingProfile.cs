@@ -22,12 +22,15 @@ namespace Saturday_Back.Common
             // PaymentType mappings
             CreateMap<PaymentTypeRequestDto, PaymentType>();
             CreateMap<PaymentType, PaymentTypeResponseDto>();
+
             // BenefitType mappings
             CreateMap<BenefitTypeRequestDto, BenefitType>();
             CreateMap<BenefitType, BenefitTypeResponseDto>();
+
             // Subject mappings
             CreateMap<SubjectRequestDto, Subject>();
             CreateMap<Subject, SubjectResponseDto>();
+
             // Student mappings
             CreateMap<StudentRequestDto, Student>();
             CreateMap<Student, StudentResponseDto>()
