@@ -1,4 +1,6 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Saturday_Back.Common.Dtos;
 using Saturday_Back.Common.Exceptions;
 using Saturday_Back.Features.Schedules.Dtos;
 
@@ -40,7 +42,7 @@ namespace Saturday_Back.Features.Schedules
             _logger.LogInformation("Creating schedule for request: {@Request}", request);
 
             var result = await _service.CreateScheduleAsync(request);
-            return Ok(new { scheduleEntries = result.ScheduleEntries, message = "Schedule created successfully" });
+            return Ok(new ApiResponse { Status = (int)HttpStatusCode.Created, Message = "Schedule created successfully", Type = "success", Data = new { scheduleEntries = result.ScheduleEntries } });
         }
     }
 }
