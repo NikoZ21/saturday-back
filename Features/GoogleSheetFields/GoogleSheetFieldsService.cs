@@ -16,9 +16,6 @@ public class GoogleSheetFieldsService(PaymentTypeService paymentTypeService, Ben
         var benefitTypes = (await _benefitTypeService.GetAllAsync()).OrderBy(x => x.Id).ToList();
         var subjects = (await _subjectService.GetAllAsync()).OrderBy(x => x.Id).ToList();
 
-        // now we need to map each element in each array to string for payment times the string should be 1. Name
-        // for benefit types the string should be 2. Name
-        // for subjects the string should be 3. Name
         var paymentTypesStrings = paymentTypes.Select(x => $"{x.Id}. {x.Name}").ToList();
         var benefitTypesStrings = benefitTypes.Select(x => $"{x.Id}. {x.Name}").ToList();
         var subjectsStrings = subjects.Select(x => $"{x.Id}. {x.Name}").ToList();

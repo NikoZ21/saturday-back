@@ -40,7 +40,7 @@ namespace Saturday_Back.Features.Schedules
             _logger.LogInformation("Creating schedule for request: {@Request}", request);
 
             var result = await _service.CreateScheduleAsync(request);
-            return Ok(result);
+            return Ok(new { scheduleEntries = result.ScheduleEntries, message = "Schedule created successfully" });
         }
     }
 }
