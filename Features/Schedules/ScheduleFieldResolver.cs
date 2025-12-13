@@ -62,27 +62,13 @@ namespace Saturday_Back.Features.Schedules
         }
         public async Task<PaymentType> ResolvePaymentTypeAsync(ScheduleRequestDto request)
         {
-            if (!Enum.TryParse<PaymentTypeValue>(request.PaymentType, ignoreCase: true, out var paymentTypeValue))
-            {
-                throw new BusinessRuleException(
-                    $"Invalid BenefitType value '{request.BenefitType}'. " +
-                    $"Valid values are: {string.Join(", ", Enum.GetNames<BenefitTypeValue>())}");
-            }
-
-            var paymentType = await _paymentTypeRepository.FirstOrDefaultAsync(pt => pt.Value == paymentTypeValue) ??
+            var paymentType = await _paymentTypeRepository.FirstOrDefaultAsync(pt => pt.Id == request.PaymentType) ??
             throw new BusinessRuleException($"Payment type '{request.PaymentType}' not found. Please ensure the payment type exists in the system.");
             return paymentType;
         }
         public async Task<BenefitType> ResolveBenefitTypeAsync(ScheduleRequestDto request)
         {
-            if (!Enum.TryParse<BenefitTypeValue>(request.BenefitType, ignoreCase: true, out var benefitTypeValue))
-            {
-                throw new BusinessRuleException(
-                    $"Invalid BenefitType value '{request.BenefitType}'. " +
-                    $"Valid values are: {string.Join(", ", Enum.GetNames<BenefitTypeValue>())}");
-            }
-
-            var benefitType = await _benefitTypeRepository.FirstOrDefaultAsync(bt => bt.Value == benefitTypeValue) ??
+            var benefitType = await _benefitTypeRepository.FirstOrDefaultAsync(bt => bt.Id == request.BenefitType) ??
             throw new BusinessRuleException($"Benefit type '{request.BenefitType}' not found. Please ensure the benefit type exists in the system.");
             return benefitType;
         }
