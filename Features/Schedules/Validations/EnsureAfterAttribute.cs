@@ -23,10 +23,10 @@ namespace Saturday_Back.Features.Schedules.Validations
             }
 
             var otherValue = otherProp.GetValue(context.ObjectInstance);
-            if (value is int current && otherValue is int other && current < other)
+            if (value is int current && otherValue is int other && current <= other)
             {
                 return new ValidationResult(ErrorMessage ??
-                   $"{context.DisplayName} must be greater than or equal to {_otherProperty}.");
+                   $"{context.DisplayName} must be greater than {_otherProperty}.");
             }
 
             return ValidationResult.Success!;
