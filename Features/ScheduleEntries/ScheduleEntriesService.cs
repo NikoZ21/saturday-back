@@ -68,12 +68,14 @@ namespace Saturday_Back.Features.ScheduleEntries
         private ScheduleEntry[] GenerateMonthlyPayments(decimal totalCost, int firstMonth, int lastMonth, AcademicYear academicYear)
         {
             var monthsCount = lastMonth - firstMonth;
+            Console.WriteLine("months count {0}", monthsCount);
 
             if (monthsCount <= 0)
                 throw new BusinessRuleException(
                     $"Last month ({lastMonth}) must be after first month ({firstMonth})");
 
             var monthlyPayment = totalCost / monthsCount;
+            Console.WriteLine("monthly payment {0}", monthlyPayment);
             var scheduleEntries = new ScheduleEntry[monthsCount];
 
             for (int i = 0; i < monthsCount; i++)
@@ -110,11 +112,12 @@ namespace Saturday_Back.Features.ScheduleEntries
                 throw new BusinessRuleException("Amount is 0. Please ensure the amount is set correctly.");
             }
 
-            var saturdaysCount = lastSaturday - firstSaturday + 1;
+            decimal saturdaysCount = lastSaturday - firstSaturday + 1;
             var totalDiscount = benefitType.Discount + (paymentType.Discount ?? 0);
             var discountedCost = amount * (1 - totalDiscount / 100);
+            var result = discountedCost * (saturdaysCount / 30);
 
-            return discountedCost * (saturdaysCount / 30);
+            return result;
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Saturday_Back.Features.Schedules
                 _logger.LogInformation("Validated no duplicate schedule");
 
                 var schedule = _scheduleFactory.Create(request, fields);
-                _logger.LogInformation("Created schedule}");
+                _logger.LogInformation("Created schedule");
 
                 var addedSchedule = await _scheduleRepository.AddAsync(schedule, s => s.ScheduleEntries);
                 _logger.LogInformation("Added schedule to database");

@@ -17,7 +17,6 @@ namespace Saturday_Back.Features.Schedules.Dtos
         [Required]
         public string StudyYear { get; set; } = string.Empty;
 
-
         // Optional information
         [StringLength(100)]
         public string FirstName { get; set; } = string.Empty;
