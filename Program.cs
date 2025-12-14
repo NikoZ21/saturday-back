@@ -62,6 +62,12 @@ builder.Services.AddMemoryCache();
 // AutoMapper - automatically discovers all Profile classes in the assembly
 builder.Services.AddAutoMapper(config =>
 {
+    // Read license key from configuration (works in all environments)
+    var licenseKey = builder.Configuration["AutoMapper:LicenseKey"];
+    if (!string.IsNullOrEmpty(licenseKey))
+    {
+        config.LicenseKey = licenseKey;
+    }
     config.AddProfile<ApplicationMappingProfile>();
 });
 
