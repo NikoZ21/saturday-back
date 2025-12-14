@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using Saturday_Back.Common.Exceptions;
+using Saturday_Back.Features.Schedules.Dtos;
 using System.Net;
 using System.Text.Json;
 
@@ -35,7 +36,7 @@ namespace Saturday_Back.Common.Middleware
             catch (BusinessRuleException ex)
             {
                 _logger.LogWarning(ex, "Business rule violation: {Message}", ex.Message);
-                await HandleExceptionAsync(context, ex, ex.StatusCode, ex.GetType().Name);
+                await HandleExceptionAsync(context, ex, ex.StatusCode, ex.GetType().Name, ex.UserMessage);
             }
             catch (DataAccessException ex)
             {
@@ -70,7 +71,8 @@ namespace Saturday_Back.Common.Middleware
                 status = statusCode,
                 message = customMessage ?? exception.Message,
                 type = exceptionType,
-                timestamp = DateTime.UtcNow
+                timestamp = DateTime.UtcNow,
+                data = new { scheduleEntries = Array.Empty<ScheduleEntryResponseDto>() }
             };
 
             var json = JsonSerializer.Serialize(response, new JsonSerializerOptions

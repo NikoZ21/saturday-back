@@ -80,7 +80,9 @@ namespace Saturday_Back.Features.Schedules
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw new BusinessRuleException("Schedule Transaction failed: " + ex.Message);
+                throw new BusinessRuleException(
+                    "Schedule Transaction failed: " + ex.Message,
+                    "შეცდომა დაფიქსირდა სტუდენტის გრაფიკის შექმნის დროს");
             }
         }
 
@@ -95,10 +97,11 @@ namespace Saturday_Back.Features.Schedules
 
             if (exists != null)
             {
+                var userMessage = $"სტუდენტის '{entities.Student.Identificator}' გრაფიკა უკვე გამოქვეყნებულია საგანს '{entities.Subject.Name}' და წელიწადზე '{studyYear}'";
+                var message = $"Schedule already exists for student '{entities.Student.Identificator}' " + $"in subject '{entities.Subject.Name}' " + $"for year '{studyYear}'";
                 throw new BusinessRuleException(
-                    $"Schedule already exists for student '{entities.Student.Identificator}' " +
-                    $"in subject '{entities.Subject.Name}' " +
-                    $"for year '{studyYear}'");
+                    message,
+                    userMessage);
             }
         }
 

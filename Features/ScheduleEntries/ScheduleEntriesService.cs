@@ -28,7 +28,7 @@ namespace Saturday_Back.Features.ScheduleEntries
                 PaymentTypeValue.ONETIME => GenerateSinglePayment(cost, firstMonth, academicYear),
                 PaymentTypeValue.TWOTIME => GenerateTwoPartPayment(cost, firstMonth, lastMonth, academicYear),
                 PaymentTypeValue.MONTHLY => GenerateMonthlyPayments(cost, firstMonth, lastMonth, academicYear),
-                _ => throw new BusinessRuleException($"Invalid payment type: {paymentType}" + $" {nameof(paymentType)}")
+                _ => throw new BusinessRuleException($"Invalid payment type: {paymentType}" + $" {nameof(paymentType)}", $"მსგავსი გადახდის ტიპი არ არსებობს")
             };
 
             List<ScheduleEntry> addedEntries = [];
@@ -72,7 +72,8 @@ namespace Saturday_Back.Features.ScheduleEntries
 
             if (monthsCount <= 0)
                 throw new BusinessRuleException(
-                    $"Last month ({lastMonth}) must be after first month ({firstMonth})");
+                    $"Last month ({lastMonth}) must be after first month ({firstMonth})",
+                    $"ბოლო თვე ({lastMonth}) უნდა იყოს პირველ თვეზე ({firstMonth}) მეტი");
 
             var monthlyPayment = totalCost / monthsCount;
             Console.WriteLine("monthly payment {0}", monthlyPayment);
@@ -109,7 +110,7 @@ namespace Saturday_Back.Features.ScheduleEntries
         {
             if (amount == 0)
             {
-                throw new BusinessRuleException("Amount is 0. Please ensure the amount is set correctly.");
+                throw new BusinessRuleException("Amount is 0. Please ensure the amount is set correctly.", "გადასახდელი თანხა არ უნდა იყოს 0");
             }
 
             decimal saturdaysCount = lastSaturday - firstSaturday + 1;
