@@ -1,4 +1,3 @@
-using Saturday_Back.Common.Enums;
 using Saturday_Back.Common.Exceptions;
 using Saturday_Back.Common.Repositories;
 using Saturday_Back.Features.AcademicYears;
@@ -56,7 +55,7 @@ namespace Saturday_Back.Features.Schedules
         }
         public async Task<Subject> ResolveSubjectAsync(ScheduleRequestDto request)
         {
-            var subject = await _subjectRepository.FirstOrDefaultAsync(s => s.Name == request.Subject) ??
+            var subject = await _subjectRepository.FirstOrDefaultAsync(s => s.Id == request.Subject) ??
             throw new BusinessRuleException($"Subject '{request.Subject}' not found. Please ensure the subject exists in the system.");
             return subject;
         }

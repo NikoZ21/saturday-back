@@ -12,7 +12,7 @@ namespace Saturday_Back.Features.Schedules.Dtos
         public string Identificator { get; set; } = string.Empty;
 
         [Required]
-        public string Subject { get; set; } = string.Empty;
+        public int Subject { get; set; }
 
         [Required]
         public string StudyYear { get; set; } = string.Empty;
@@ -35,6 +35,7 @@ namespace Saturday_Back.Features.Schedules.Dtos
         [Range(1, 30)]
         [EnsureAfter("FirstSaturday")]
         public int LastSaturday { get; set; } = 30;
+
 
         [Range(10, 17)]
         public int FirstMonth { get; set; } = 10;
